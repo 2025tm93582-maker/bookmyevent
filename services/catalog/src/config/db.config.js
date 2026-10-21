@@ -5,8 +5,13 @@ import { readdir, readFile } from "node:fs/promises";
 
 const pool = mysql.createPool({
     ...env.db,
+    timezone: "Z",
     waitForConnections: true,
     connectionLimit: 10,
+});
+
+pool.pool.on("connection", (conn) => {
+    conn.query("SET time_zone = '+00:00'");
 });
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -28,7 +33,7 @@ const connect = async (retries = 10, delayMs = 2000) => {
 const migrate = async () => {
     const dir = new URL("../migrations/", import.meta.url);
     const files = (await readdir(dir)).filter((file) => file.endsWith(".sql")).sort();
-    const conn = await mysql.createConnection({ ...env.db, multipleStatements: true });
+    const conn = await mysql.createConnection({ ...env.db, timezone: "Z", multipleStatements: true });
 
     try {
         await conn.query(

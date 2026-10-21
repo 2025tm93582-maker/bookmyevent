@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS shows (
 
 CREATE TABLE IF NOT EXISTS show_prices (
     show_id INT NOT NULL,
-    category VARCHAR(20) NOT NULL,
+    tier VARCHAR(20) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    PRIMARY KEY (show_id, category),
+    PRIMARY KEY (show_id, tier),
     FOREIGN KEY (show_id) REFERENCES shows(id)
 );

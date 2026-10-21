@@ -11,7 +11,7 @@ const create = async (data) => {
 
 const ensureExists = async (code) => {
     if (!(await CategoryRepository.findByCode(code))) {
-        throw new AppError(400, "INVALID_CATEGORY", `Category ${code} does not exist`);
+        throw new AppError(422, "INVALID_CATEGORY", `Category ${code} does not exist`);
     }
 };
 
