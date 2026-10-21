@@ -7,6 +7,7 @@ app.listen(env.port, async () => {
     logger.info({ port: env.port }, `${env.serviceName} service listening`);
     try {
         await CatalogDB.connect();
+        await CatalogDB.migrate();
     } catch (err) {
         logger.fatal({ err }, "Failed to start");
         process.exit(1);

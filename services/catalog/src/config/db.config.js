@@ -1,6 +1,7 @@
 import mysql from "mysql2/promise";
 import env from "./env.config.js";
 import logger from "./logger.config.js";
+import { readdir, readFile } from "node:fs/promises";
 
 const pool = mysql.createPool({
     ...env.db,
@@ -24,8 +25,31 @@ const connect = async (retries = 10, delayMs = 2000) => {
     }
 };
 
+const migrate = async () => {
+    const dir = new URL("../migrations/", import.meta.url);
+    const files = (await readdir(dir)).filter((file) => file.endsWith(".sql")).sort();
+    const conn = await mysql.createConnection({ ...env.db, multipleStatements: true });
+
+    try {
+        await conn.query(
+            "CREATE TABLE IF NOT EXISTS schema_migrations (file VARCHAR(255) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
+        );
+        const [rows] = await conn.query("SELECT file FROM schema_migrations");
+        const applied = new Set(rows.map((row) => row.file));
+
+        for (const file of files) {
+            if (applied.has(file)) continue;
+            await conn.query(await readFile(new URL(file, dir), "utf8"));
+            await conn.query("INSERT INTO schema_migrations (file) VALUES (?)", [file]);
+            logger.info({ file }, "Migration applied");
+        }
+    } finally {
+        await conn.end();
+    }
+};
+
 const ping = async () => {
     await pool.query("SELECT 1");
 };
 
-export default { pool, connect, ping };
+export default { pool, connect, ping, migrate };
