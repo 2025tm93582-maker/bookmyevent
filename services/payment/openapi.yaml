@@ -1,0 +1,187 @@
+openapi: 3.0.3
+info:
+    title: BookMyEvent — Payment Service (mock gateway)
+    version: 1.0.0
+    description: |
+        Mock payment gateway. Charges are idempotent via the Idempotency-Key header.
+        Use cardToken "tok_visa" to succeed and "tok_decline" to get a decline.
+        PAYMENT_DELAY_MS slows every charge; PAYMENT_FAIL_RATE (0–1) makes the gateway return 503.
+servers:
+    - url: http://localhost:3004
+
+paths:
+    /health:
+        get:
+            summary: Service and database health
+            responses:
+                "200":
+                    description: Up
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Health" }
+                "503":
+                    description: Database down
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Health" }
+
+    /api/v1/payments:
+        post:
+            summary: Charge a booking (idempotent)
+            description: |
+                The first request with a key is processed. A repeat with the same key and body returns the stored
+                response with header Idempotent-Replayed: true. The same key with a different body returns 422.
+                While the first request is still running, a repeat returns 409 REQUEST_IN_PROGRESS.
+                4xx results are stored and replayed; 5xx results release the key so the client may retry.
+            parameters:
+                - $ref: "#/components/parameters/IdempotencyKey"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema: { $ref: "#/components/schemas/ChargeRequest" }
+            responses:
+                "201":
+                    description: Charged (or replayed)
+                    headers:
+                        Idempotent-Replayed:
+                            description: Present and "true" when this is a stored response
+                            schema: { type: string }
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Payment" }
+                "400": { $ref: "#/components/responses/BadRequest" }
+                "402":
+                    description: PAYMENT_DECLINED — the card was declined (stored and replayed)
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "409":
+                    description: REQUEST_IN_PROGRESS (retry shortly) or PAYMENT_EXISTS (booking already charged)
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "422":
+                    description: IDEMPOTENCY_KEY_REUSED — same key, different request
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "503":
+                    description: GATEWAY_UNAVAILABLE — simulated outage; the key is released
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+        get:
+            summary: List payments of a booking
+            parameters:
+                - name: bookingId
+                  in: query
+                  required: true
+                  schema: { type: string }
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items: { $ref: "#/components/schemas/Payment" }
+
+    /api/v1/payments/{id}:
+        get:
+            summary: Get a payment
+            parameters:
+                - $ref: "#/components/parameters/PaymentId"
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Payment" }
+                "400": { $ref: "#/components/responses/BadRequest" }
+                "404": { $ref: "#/components/responses/NotFound" }
+
+    /api/v1/payments/{id}/refund:
+        post:
+            summary: Refund a payment — repeating returns 200 with the same refunded payment
+            parameters:
+                - $ref: "#/components/parameters/PaymentId"
+            responses:
+                "200":
+                    description: Refunded
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Payment" }
+                "404": { $ref: "#/components/responses/NotFound" }
+                "409":
+                    description: PAYMENT_NOT_REFUNDABLE — e.g. a declined payment
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+
+components:
+    parameters:
+        IdempotencyKey:
+            name: Idempotency-Key
+            in: header
+            required: true
+            description: 8–64 characters (letters, digits, - or _). One key per payment intent.
+            schema: { type: string, example: key-0001-abc }
+        PaymentId:
+            name: id
+            in: path
+            required: true
+            schema: { type: string, format: uuid }
+
+    schemas:
+        Health:
+            type: object
+            properties:
+                status: { type: string, enum: [UP, DOWN] }
+                service: { type: string, example: payment }
+                db: { type: string, enum: [UP, DOWN] }
+
+        ChargeRequest:
+            type: object
+            required: [bookingId, amount, cardToken]
+            properties:
+                bookingId: { type: string, example: bk-1 }
+                amount: { type: number, minimum: 0, exclusiveMinimum: true, example: 7000 }
+                currency: { type: string, enum: [INR], default: INR }
+                cardToken: { type: string, example: tok_visa }
+
+        Payment:
+            type: object
+            properties:
+                id: { type: string, format: uuid }
+                bookingId: { type: string }
+                amount: { type: number }
+                currency: { type: string }
+                status: { type: string, enum: [SUCCEEDED, DECLINED, REFUNDED] }
+                createdAt: { type: string, format: date-time }
+                refundedAt: { type: string, format: date-time, nullable: true }
+
+        Error:
+            type: object
+            properties:
+                error:
+                    type: object
+                    properties:
+                        code: { type: string, example: IDEMPOTENCY_KEY_REUSED }
+                        message: { type: string }
+                        details:
+                            type: array
+                            items: { type: object }
+                        correlationId: { type: string }
+
+    responses:
+        BadRequest:
+            description: Malformed request or missing Idempotency-Key
+            content:
+                application/json:
+                    schema: { $ref: "#/components/schemas/Error" }
+        NotFound:
+            description: Not found
+            content:
+                application/json:
+                    schema: { $ref: "#/components/schemas/Error" }
