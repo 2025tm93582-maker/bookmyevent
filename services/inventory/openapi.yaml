@@ -1,0 +1,242 @@
+openapi: 3.0.3
+info:
+    title: BookMyEvent — Seat Inventory Service
+    version: 1.0.0
+    description: Seat layouts per show and seat holds. Holds are atomic and all-or-nothing (BR3).
+servers:
+    - url: http://localhost:3002
+
+paths:
+    /health:
+        get:
+            summary: Service and database health
+            responses:
+                "200":
+                    description: Up
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Health" }
+                "503":
+                    description: Database down
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Health" }
+
+    /api/v1/shows/{id}/seats:
+        get:
+            summary: Seat map of a show with a status summary
+            parameters:
+                - $ref: "#/components/parameters/ShowId"
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/SeatMap" }
+                "400": { $ref: "#/components/responses/BadRequest" }
+                "404": { $ref: "#/components/responses/NotFound" }
+        post:
+            summary: Create the seat layout of a show (once)
+            parameters:
+                - $ref: "#/components/parameters/ShowId"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema: { $ref: "#/components/schemas/LayoutCreate" }
+            responses:
+                "201":
+                    description: Created
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/SeatMap" }
+                "400": { $ref: "#/components/responses/BadRequest" }
+                "409": { $ref: "#/components/responses/Conflict" }
+
+    /api/v1/holds:
+        post:
+            summary: Hold seats atomically (BR3) — all requested seats or none
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema: { $ref: "#/components/schemas/HoldCreate" }
+            responses:
+                "201":
+                    description: Seats held
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Hold" }
+                "400": { $ref: "#/components/responses/BadRequest" }
+                "409":
+                    description: SEAT_UNAVAILABLE — details list the taken seats
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "422":
+                    description: UNKNOWN_SEATS — details list seats that do not exist
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+
+    /api/v1/holds/{id}:
+        get:
+            summary: Get a hold
+            parameters:
+                - $ref: "#/components/parameters/HoldId"
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Hold" }
+                "400": { $ref: "#/components/responses/BadRequest" }
+                "404": { $ref: "#/components/responses/NotFound" }
+
+    /api/v1/holds/{id}/confirm:
+        post:
+            summary: Confirm a hold — seats become SOLD. Repeating returns 200 with the same hold.
+            parameters:
+                - $ref: "#/components/parameters/HoldId"
+            responses:
+                "200":
+                    description: Confirmed
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Hold" }
+                "404": { $ref: "#/components/responses/NotFound" }
+                "409":
+                    description: HOLD_NOT_ACTIVE — the hold was already released
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+
+    /api/v1/holds/{id}/release:
+        post:
+            summary: Release a hold — seats become AVAILABLE. Repeating returns 200 with the same hold.
+            parameters:
+                - $ref: "#/components/parameters/HoldId"
+            responses:
+                "200":
+                    description: Released
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Hold" }
+                "404": { $ref: "#/components/responses/NotFound" }
+                "409":
+                    description: HOLD_ALREADY_CONFIRMED — sold seats cannot be released
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+
+components:
+    parameters:
+        ShowId:
+            name: id
+            in: path
+            required: true
+            description: Catalog show id
+            schema: { type: integer, minimum: 1 }
+        HoldId:
+            name: id
+            in: path
+            required: true
+            schema: { type: string, format: uuid }
+
+    schemas:
+        Health:
+            type: object
+            properties:
+                status: { type: string, enum: [UP, DOWN] }
+                service: { type: string, example: inventory }
+                db: { type: string, enum: [UP, DOWN] }
+
+        LayoutCreate:
+            type: object
+            required: [rows]
+            properties:
+                rows:
+                    type: array
+                    minItems: 1
+                    maxItems: 26
+                    items:
+                        type: object
+                        required: [row, count, tier]
+                        properties:
+                            row: { type: string, example: A }
+                            count: { type: integer, minimum: 1, maximum: 50, example: 10 }
+                            tier: { type: string, example: GOLD }
+
+        Seat:
+            type: object
+            properties:
+                seatNo: { type: string, example: A1 }
+                tier: { type: string, example: GOLD }
+                status: { type: string, enum: [AVAILABLE, HELD, SOLD] }
+
+        SeatMap:
+            type: object
+            properties:
+                showId: { type: integer }
+                summary:
+                    type: object
+                    properties:
+                        AVAILABLE: { type: integer }
+                        HELD: { type: integer }
+                        SOLD: { type: integer }
+                seats:
+                    type: array
+                    items: { $ref: "#/components/schemas/Seat" }
+
+        HoldCreate:
+            type: object
+            required: [showId, seats]
+            properties:
+                showId: { type: integer, example: 1 }
+                seats:
+                    type: array
+                    minItems: 1
+                    maxItems: 10
+                    items: { type: string, example: A1 }
+
+        Hold:
+            type: object
+            properties:
+                id: { type: string, format: uuid }
+                showId: { type: integer }
+                status: { type: string, enum: [HELD, CONFIRMED, RELEASED] }
+                seats:
+                    type: array
+                    items: { type: string }
+                createdAt: { type: string, format: date-time }
+                updatedAt: { type: string, format: date-time }
+
+        Error:
+            type: object
+            properties:
+                error:
+                    type: object
+                    properties:
+                        code: { type: string, example: SEAT_UNAVAILABLE }
+                        message: { type: string }
+                        details:
+                            type: array
+                            items: { type: object }
+                        correlationId: { type: string }
+
+    responses:
+        BadRequest:
+            description: Malformed request
+            content:
+                application/json:
+                    schema: { $ref: "#/components/schemas/Error" }
+        NotFound:
+            description: Not found
+            content:
+                application/json:
+                    schema: { $ref: "#/components/schemas/Error" }
+        Conflict:
+            description: Conflicts with existing state
+            content:
+                application/json:
+                    schema: { $ref: "#/components/schemas/Error" }

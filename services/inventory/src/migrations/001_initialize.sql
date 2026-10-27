@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS show_seats (
+    show_id INT NOT NULL,
+    seat_no VARCHAR(10) NOT NULL,
+    row_label VARCHAR(2) NOT NULL,
+    seat_number INT NOT NULL,
+    tier VARCHAR(20) NOT NULL,
+    status ENUM('AVAILABLE', 'HELD', 'SOLD') NOT NULL DEFAULT 'AVAILABLE',
+    hold_id CHAR(36) NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (show_id, seat_no),
+    INDEX idx_show_seats_hold (hold_id)
+);
+
+CREATE TABLE IF NOT EXISTS holds (
+    id CHAR(36) PRIMARY KEY,
+    show_id INT NOT NULL,
+    status ENUM('HELD', 'CONFIRMED', 'RELEASED') NOT NULL DEFAULT 'HELD',
+    seats JSON NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
