@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+    title: BookMyEvent — Notification Service (mock provider)
+    version: 1.0.0
+    description: |
+        Mock email/SMS provider. "Sending" writes the message to the log ("Notification sent (mock)").
+        Each (bookingId, template, channel) is sent at most once: a repeat returns the existing notification with 200.
+        NOTIFY_DELAY_MS slows every send; NOTIFY_FAIL_RATE (0–1) makes the provider return 503.
+servers:
+    - url: http://localhost:3005
+
+paths:
+    /health:
+        get:
+            summary: Service and database health
+            responses:
+                "200":
+                    description: Up
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Health" }
+                "503":
+                    description: Database down
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Health" }
+
+    /api/v1/notifications:
+        post:
+            summary: Send a notification (at most once per booking, template and channel)
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema: { $ref: "#/components/schemas/SendRequest" }
+            responses:
+                "201":
+                    description: Sent
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Notification" }
+                "200":
+                    description: Already sent earlier — the existing notification is returned
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Notification" }
+                "400":
+                    description: Malformed request (e.g. SMS with an email address)
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "503":
+                    description: PROVIDER_UNAVAILABLE — simulated outage
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+        get:
+            summary: List notifications of a booking
+            parameters:
+                - name: bookingId
+                  in: query
+                  required: true
+                  schema: { type: string }
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items: { $ref: "#/components/schemas/Notification" }
+
+components:
+    schemas:
+        Health:
+            type: object
+            properties:
+                status: { type: string, enum: [UP, DOWN] }
+                service: { type: string, example: notification }
+                db: { type: string, enum: [UP, DOWN] }
+
+        SendRequest:
+            type: object
+            required: [bookingId, recipient, template]
+            properties:
+                bookingId: { type: string, example: bk-1 }
+                channel: { type: string, enum: [EMAIL, SMS], default: EMAIL }
+                recipient: { type: string, example: aksh@example.com }
+                template: { type: string, enum: [BOOKING_CONFIRMED, BOOKING_FAILED, BOOKING_CANCELLED] }
+                data:
+                    type: object
+                    additionalProperties: true
+                    example: { eventTitle: Arijit Singh Live, seats: [A1, A2] }
+
+        Notification:
+            type: object
+            properties:
+                id: { type: string, format: uuid }
+                bookingId: { type: string }
+                channel: { type: string, enum: [EMAIL, SMS] }
+                recipient: { type: string }
+                template: { type: string }
+                message: { type: string, example: "Your booking bk-1 for Arijit Singh Live is confirmed. Seats: A1, A2." }
+                createdAt: { type: string, format: date-time }
+
+        Error:
+            type: object
+            properties:
+                error:
+                    type: object
+                    properties:
+                        code: { type: string, example: PROVIDER_UNAVAILABLE }
+                        message: { type: string }
+                        details:
+                            type: array
+                            items: { type: object }
+                        correlationId: { type: string }
