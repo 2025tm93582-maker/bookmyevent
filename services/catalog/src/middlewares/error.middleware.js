@@ -1,5 +1,7 @@
 import AppError from "../utils/app-error.util.js";
-import logger from "../config/logger.config.js";
+import Logger from "../config/logger.config.js";
+
+const { logger } = Logger;
 
 const notFound = (req, res, next) => {
     next(new AppError(404, "ROUTE_NOT_FOUND", `No route for ${req.method} ${req.originalUrl}`));

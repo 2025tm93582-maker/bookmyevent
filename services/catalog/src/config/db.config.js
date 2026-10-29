@@ -1,6 +1,8 @@
 import mysql from "mysql2/promise";
 import env from "./env.config.js";
-import logger from "./logger.config.js";
+import Logger from "./logger.config.js";
+
+const { logger } = Logger;
 import { readdir, readFile } from "node:fs/promises";
 
 const pool = mysql.createPool({

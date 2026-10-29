@@ -1,6 +1,5 @@
 import express from "express";
-import pinoHttp from "pino-http";
-import logger from "./config/logger.config.js";
+import Logger from "./config/logger.config.js";
 import correlationId from "./middlewares/correlation.middleware.js";
 import ErrorMiddleware from "./middlewares/error.middleware.js";
 import HealthRoutes from "./routes/health/health.route.js";
@@ -13,13 +12,7 @@ const app = express();
 const spec = YAML.parse(readFileSync(new URL("../openapi.yaml", import.meta.url), "utf8"));
 
 app.use(correlationId);
-app.use(
-    pinoHttp({
-        logger,
-        genReqId: (req) => req.correlationId,
-        customProps: (req) => ({ correlationId: req.correlationId }),
-    }),
-);
+app.use(Logger.httpLogger);
 app.use(express.json());
 
 app.use("/health", HealthRoutes);
