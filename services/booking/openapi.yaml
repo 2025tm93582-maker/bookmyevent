@@ -1,0 +1,197 @@
+openapi: 3.0.3
+info:
+    title: BookMyEvent — Booking Service (saga orchestrator)
+    version: 1.0.0
+    description: |
+        Runs the ticket-buying saga: check show and price (Catalog, Inventory) → hold seats → charge →
+        confirm seats → notify. If a step fails, earlier steps are compensated in reverse order
+        (refund, then release seats). Every step is recorded and returned in `steps`.
+        Business rules: BR4 1–6 seats, BR5 booking closes BOOKING_CUTOFF_MINUTES before the show,
+        BR6 amount calculated from Catalog tier prices, BR7 allowed state transitions only.
+servers:
+    - url: http://localhost:3003
+
+paths:
+    /health:
+        get:
+            summary: Service and database health
+            responses:
+                "200":
+                    description: Up
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Health" }
+                "503":
+                    description: Database down
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Health" }
+
+    /api/v1/bookings:
+        post:
+            summary: Book seats (idempotent saga)
+            description: |
+                Same Idempotency-Key and body → the stored response is replayed (Idempotent-Replayed: true).
+                Same key, different body → 422. 4xx results are stored; 5xx results release the key.
+            parameters:
+                - $ref: "#/components/parameters/IdempotencyKey"
+                - $ref: "#/components/parameters/CorrelationId"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema: { $ref: "#/components/schemas/BookingRequest" }
+            responses:
+                "201":
+                    description: Booking CONFIRMED (or replayed)
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Booking" }
+                "400":
+                    description: Malformed request (BR4) or missing Idempotency-Key
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "402":
+                    description: PAYMENT_DECLINED — seats released, booking FAILED
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "404":
+                    description: SHOW_NOT_FOUND
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "409":
+                    description: SEAT_UNAVAILABLE (booking REJECTED) or REQUEST_IN_PROGRESS
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "422":
+                    description: BOOKING_CLOSED (BR5), UNKNOWN_SEATS or NO_SEAT_LAYOUT (BR6), IDEMPOTENCY_KEY_REUSED
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "500":
+                    description: COMPENSATION_INCOMPLETE — a compensation failed; booking left in COMPENSATING
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "502":
+                    description: BOOKING_FAILED — seat confirmation failed; payment refunded and seats released
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "503":
+                    description: CATALOG_UNAVAILABLE, INVENTORY_UNAVAILABLE or PAYMENT_UNAVAILABLE (seats released)
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+
+    /api/v1/bookings/{id}:
+        get:
+            summary: Get a booking with its saga step log
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema: { type: string, format: uuid }
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Booking" }
+                "400":
+                    description: INVALID_ID
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+                "404":
+                    description: BOOKING_NOT_FOUND
+                    content:
+                        application/json:
+                            schema: { $ref: "#/components/schemas/Error" }
+
+components:
+    parameters:
+        IdempotencyKey:
+            name: Idempotency-Key
+            in: header
+            required: true
+            description: 8–64 characters (letters, digits, - or _). One key per booking attempt.
+            schema: { type: string, example: book-0001-happy }
+        CorrelationId:
+            name: X-Correlation-Id
+            in: header
+            required: false
+            description: Reused if sent, otherwise generated; forwarded to every downstream service.
+            schema: { type: string, example: demo-happy-001 }
+
+    schemas:
+        Health:
+            type: object
+            properties:
+                status: { type: string, enum: [UP, DOWN] }
+                service: { type: string, example: booking }
+                db: { type: string, enum: [UP, DOWN] }
+
+        BookingRequest:
+            type: object
+            required: [showId, seats, customerEmail, cardToken]
+            properties:
+                showId: { type: integer, example: 1 }
+                seats:
+                    type: array
+                    minItems: 1
+                    maxItems: 6
+                    items: { type: string, example: B2 }
+                customerEmail: { type: string, format: email, example: aksh@example.com }
+                cardToken: { type: string, example: tok_visa, description: "tok_visa succeeds, tok_decline is declined" }
+
+        SagaStep:
+            type: object
+            properties:
+                step:
+                    type: string
+                    enum: [CHECK, HOLD_SEATS, CHARGE_PAYMENT, CONFIRM_SEATS, REFUND_PAYMENT, RELEASE_SEATS, NOTIFY]
+                outcome: { type: string, enum: [OK, FAILED, SKIPPED] }
+                detail: { type: string, nullable: true }
+                at: { type: string, format: date-time }
+
+        Booking:
+            type: object
+            properties:
+                id: { type: string, format: uuid }
+                showId: { type: integer }
+                customerEmail: { type: string }
+                seats:
+                    type: array
+                    items: { type: string }
+                amount: { type: number, example: 8500 }
+                currency: { type: string, example: INR }
+                status:
+                    type: string
+                    enum: [PENDING, SEATS_HELD, PAID, CONFIRMED, COMPENSATING, FAILED, REJECTED, CANCELLED]
+                holdId: { type: string, format: uuid, nullable: true }
+                paymentId: { type: string, format: uuid, nullable: true }
+                failureReason: { type: string, nullable: true, example: SEAT_CONFIRMATION_FAILED }
+                createdAt: { type: string, format: date-time }
+                updatedAt: { type: string, format: date-time }
+                steps:
+                    type: array
+                    items: { $ref: "#/components/schemas/SagaStep" }
+
+        Error:
+            type: object
+            properties:
+                error:
+                    type: object
+                    properties:
+                        code: { type: string, example: BOOKING_FAILED }
+                        message: { type: string }
+                        details:
+                            type: array
+                            items: { type: object }
+                            example: [{ bookingId: 2f1c0e0e-0000-4000-8000-000000000000, status: FAILED }]
+                        correlationId: { type: string }
