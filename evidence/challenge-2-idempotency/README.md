@@ -49,6 +49,7 @@ Every file starts with the command, the time it ran and which failure switches w
 | `db-state.png` | Terminal: `02-db-state.txt` |
 | `workbench-db-state.png` | MySQL Workbench: exactly one payment for each of the run's four bookings |
 | `slow-gateway-run.png`, `gateway-down-run.png` | Screenshots of `03` and `05` |
+| `replay-logs.png` | Screenshot of the replay lines from `logs/payment.log` (time, correlation id, key, message), 22 in total |
 
 | Case | Result (normal gateway) |
 |---|---|
