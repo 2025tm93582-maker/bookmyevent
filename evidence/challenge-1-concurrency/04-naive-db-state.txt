@@ -1,0 +1,18 @@
+# 2026-10-31 17:19:15 +0530 | database state after the naive run
+
+$ mysql inventory_db -e "SELECT seat_no, status, hold_id FROM show_seats WHERE show_id = 998740; SELECT COUNT(*) AS holds FROM holds WHERE show_id = 998740;"
+seat_no	status	hold_id
+A1	HELD	8a576254-b17f-4560-a441-f04f01dc311e
+holds
+20
+
+$ mysql inventory_db -e "SELECT seat_no, status, hold_id FROM show_seats WHERE show_id = 982045; SELECT COUNT(*) AS holds FROM holds WHERE show_id = 982045;"
+seat_no	status	hold_id
+A1	HELD	dc37a4cf-ff81-422e-a558-10fbdfe423e8
+A2	HELD	fb82d670-7966-405c-89fc-b5547537bfe7
+A3	HELD	817e6aa8-0e34-486e-b670-f59da548e0bc
+A4	HELD	e795f8e5-1cba-45a2-b6f1-49facbbd2068
+A5	HELD	b458399b-81d0-4692-a278-9bbb35305b7f
+holds
+20
+

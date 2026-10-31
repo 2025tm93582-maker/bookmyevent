@@ -1,0 +1,27 @@
+$ node scripts/challenge2-idempotency.mjs
+# 2026-10-31 17:23:41 +0530 | services: payment: PAYMENT_FAIL_RATE=1
+
+Challenge 2: idempotency (run mvwcepfj)
+
+Case 1: same request 4 times in a row (key seq-mvwcepfj)
+call 1: 503 GATEWAY_UNAVAILABLE
+call 2: 503 GATEWAY_UNAVAILABLE, replayed: false
+call 3: 503 GATEWAY_UNAVAILABLE, replayed: false
+call 4: 503 GATEWAY_UNAVAILABLE, replayed: false
+FAIL  repeats return the same payment
+FAIL  one payment in the database
+
+Case 2: same key, different amount (key mismatch-mvwcepfj)
+second call: 503 GATEWAY_UNAVAILABLE
+FAIL  different payload is rejected with 422
+
+Case 3: 20 identical requests at the same moment (key burst-mvwcepfj)
+created: 0, replayed: 0, 409 in progress: 16, other: 4
+FAIL  only one request created a payment
+FAIL  one payment in the database
+
+Case 4: 20 requests with different keys for the same booking
+success: 0, rejected: 20
+FAIL  one payment in the database
+
+RESULT: SOME CHECKS FAILED

@@ -1,0 +1,27 @@
+$ node scripts/challenge2-idempotency.mjs
+# 2026-10-31 17:21:03 +0530 | services: all normal
+
+Challenge 2: idempotency (run mvwcbb7h)
+
+Case 1: same request 4 times in a row (key seq-mvwcbb7h)
+call 1: 201 04bca0c6-d98e-44f1-b2c7-5e3fba559359
+call 2: 201 04bca0c6-d98e-44f1-b2c7-5e3fba559359, replayed: true
+call 3: 201 04bca0c6-d98e-44f1-b2c7-5e3fba559359, replayed: true
+call 4: 201 04bca0c6-d98e-44f1-b2c7-5e3fba559359, replayed: true
+PASS  repeats return the same payment
+PASS  one payment in the database
+
+Case 2: same key, different amount (key mismatch-mvwcbb7h)
+second call: 422 IDEMPOTENCY_KEY_REUSED
+PASS  different payload is rejected with 422
+
+Case 3: 20 identical requests at the same moment (key burst-mvwcbb7h)
+created: 1, replayed: 19, 409 in progress: 0, other: 0
+PASS  only one request created a payment
+PASS  one payment in the database
+
+Case 4: 20 requests with different keys for the same booking
+success: 1, rejected: 19
+PASS  one payment in the database
+
+RESULT: ALL PASS

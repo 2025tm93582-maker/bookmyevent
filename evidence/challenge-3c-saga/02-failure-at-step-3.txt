@@ -1,0 +1,23 @@
+$ node scripts/challenge3c-saga.mjs
+# 2026-10-31 17:24:26 +0530 | services: inventory: FAULT_CONFIRM_FAIL=true
+
+Challenge 3C: saga with compensation (correlation id saga-mvwcfnrk)
+show 3 with seats A1-A4, booking A1 and A2
+
+POST /bookings: 502
+booking 5feb7acf-3a66-4e4e-aac5-c79c087011c6: FAILED
+saga steps:
+  CHECK OK show 3, amount 4000
+  HOLD_SEATS OK hold 765838a3-5756-4345-b492-ccf6749dee0c
+  CHARGE_PAYMENT OK payment aa588fd1-8c5c-4a87-8591-1babf79ac1c0
+  CONFIRM_SEATS FAILED HTTP 500 SIMULATED_FAILURE
+  REFUND_PAYMENT OK HTTP 200
+  RELEASE_SEATS OK HTTP 200
+  NOTIFY OK HTTP 201
+
+final state:
+  booking: FAILED
+  payment: REFUNDED
+  hold: RELEASED, seats: A1 AVAILABLE, A2 AVAILABLE
+
+RESULT: CONSISTENT

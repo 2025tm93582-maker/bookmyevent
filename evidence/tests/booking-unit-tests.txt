@@ -1,0 +1,24 @@
+
+> booking@1.0.0 test
+> node --test
+
+✔ BR5: booking is open 30 minutes before the show (0.3505ms)
+✔ BR5: booking is closed 10 minutes before the show (0.31125ms)
+✔ BR5: booking is closed after the show started (0.05825ms)
+✔ BR6: amount is the sum of Catalog tier prices (0.2875ms)
+✔ BR6: unknown seats or unpriced tiers are reported (0.069791ms)
+✔ BR7: happy path transitions are allowed (0.056292ms)
+✔ BR7: a confirmed booking can never be failed or compensated (0.047375ms)
+✔ BR7: final states cannot move (0.046875ms)
+✔ BR4: 1 to 6 seats are accepted (1.103416ms)
+✔ BR4: 0 or 7 seats are rejected (0.112416ms)
+✔ BR4: duplicate seats are rejected (0.072625ms)
+✔ a valid email is required (0.056166ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 59.435334

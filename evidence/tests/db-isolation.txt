@@ -1,0 +1,12 @@
+Sat Oct 31 17:16:23 IST 2026
+booking_user can see only its own database:
+Database
+booking_db
+information_schema
+performance_schema
+
+booking_user tries to open inventory_db (should be denied):
+ERROR 1044 (42000) at line 1: Access denied for user 'booking_user'@'%' to database 'inventory_db'
+
+inventory_user tries to read payment_db (should be denied):
+ERROR 1142 (42000) at line 1: SELECT command denied to user 'inventory_user'@'localhost' for table 'payments'

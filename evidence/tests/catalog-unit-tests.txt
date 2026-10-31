@@ -1,0 +1,21 @@
+
+> catalog@1.0.0 test
+> node --test
+
+✔ toId parses a numeric string (0.303541ms)
+✔ toId rejects non-numeric and non-positive ids (0.204875ms)
+✔ BR-C1: rejects a show starting in 30 minutes (0.283125ms)
+✔ BR-C1: rejects a show in the past (0.045417ms)
+✔ BR-C1: accepts a show exactly 1 hour ahead (0.045125ms)
+✔ BR-C2: accepts a valid show and upper-cases tiers (2.023792ms)
+✔ BR-C2: rejects duplicate tiers (case-insensitive) (0.2615ms)
+✔ BR-C2: rejects an empty price list (0.088875ms)
+✔ BR-C2: rejects a zero price (0.075959ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 70.422417

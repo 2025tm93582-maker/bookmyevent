@@ -1,0 +1,19 @@
+# 2026-10-31 17:21:24 +0530 | database state for run mvwcbb7h
+
+$ mysql payment_db -e "SELECT booking_id, COUNT(*) AS payments FROM payments WHERE booking_id LIKE '%mvwcbb7h' GROUP BY booking_id;"
+booking_id	payments
+bk-burst-mvwcbb7h	1
+bk-keys-mvwcbb7h	1
+bk-mm-mvwcbb7h	1
+bk-seq-mvwcbb7h	1
+
+$ mysql payment_db -e "SELECT idem_key, status, response_code, LEFT(request_hash, 16) AS fingerprint FROM idempotency_keys WHERE idem_key LIKE '%mvwcbb7h%' AND idem_key NOT LIKE 'multi-%';"
+idem_key	status	response_code	fingerprint
+burst-mvwcbb7h	COMPLETED	201	c71c5ddd3b78644d
+mismatch-mvwcbb7h	COMPLETED	201	76280447379bbcc8
+seq-mvwcbb7h	COMPLETED	201	edaa0402a83439e2
+
+$ mysql payment_db -e "SELECT id, booking_id, amount, status, created_at FROM payments WHERE booking_id = 'bk-burst-mvwcbb7h';"
+id	booking_id	amount	status	created_at
+a2fd63a7-16f4-4d47-8373-4f444fca80f7	bk-burst-mvwcbb7h	3500.00	SUCCEEDED	2026-10-31 17:21:03
+

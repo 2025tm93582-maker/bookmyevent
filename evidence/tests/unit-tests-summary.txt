@@ -1,0 +1,18 @@
+$ bash scripts/test-all.sh
+# 2026-10-31 17:16:12 +0530 | services: all normal
+
+catalog
+ℹ pass 9
+ℹ fail 0
+inventory
+ℹ pass 8
+ℹ fail 0
+payment
+ℹ pass 9
+ℹ fail 0
+notification
+ℹ pass 6
+ℹ fail 0
+booking
+ℹ pass 12
+ℹ fail 0

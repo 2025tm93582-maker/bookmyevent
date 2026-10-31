@@ -1,0 +1,21 @@
+$ node scripts/challenge3c-saga.mjs
+# 2026-10-31 17:27:48 +0530 | services: notification: NOTIFY_FAIL_RATE=1
+
+Challenge 3C: saga with compensation (correlation id saga-mvwcjztr)
+show 6 with seats A1-A4, booking A1 and A2
+
+POST /bookings: 201
+booking 0151d941-6dcc-475b-90ec-7507d3349856: CONFIRMED
+saga steps:
+  CHECK OK show 6, amount 4000
+  HOLD_SEATS OK hold 406ca921-c5e0-444c-a1e8-5dff7f9ea0ef
+  CHARGE_PAYMENT OK payment af32ec1b-0064-4aba-9e7a-59353e0f1fe9
+  CONFIRM_SEATS OK 
+  NOTIFY FAILED HTTP 503 PROVIDER_UNAVAILABLE
+
+final state:
+  booking: CONFIRMED
+  payment: SUCCEEDED
+  hold: CONFIRMED, seats: A1 SOLD, A2 SOLD
+
+RESULT: CONSISTENT

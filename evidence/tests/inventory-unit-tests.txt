@@ -1,0 +1,20 @@
+
+> inventory@1.0.0 test
+> node --test
+
+✔ BR3: a HELD hold can be confirmed or released (0.275875ms)
+✔ BR3: a CONFIRMED hold can never be released (sold seats stay sold) (0.046833ms)
+✔ BR3: a RELEASED hold cannot be confirmed (0.037958ms)
+✔ BR3: unknown states are rejected (0.034542ms)
+✔ accepts a valid hold and upper-cases seats (1.246583ms)
+✔ rejects duplicate seats in one request (0.106458ms)
+✔ rejects badly formed seat numbers (0.10775ms)
+✔ summary counts seats by status (0.458792ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 71.900375

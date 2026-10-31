@@ -1,0 +1,18 @@
+# 2026-10-31 17:18:49 +0530 | database state after the atomic run
+
+$ mysql inventory_db -e "SELECT seat_no, status, hold_id FROM show_seats WHERE show_id = 925917; SELECT COUNT(*) AS holds FROM holds WHERE show_id = 925917;"
+seat_no	status	hold_id
+A1	HELD	5e985c63-43d6-469a-a4f5-d70fe819c12e
+holds
+1
+
+$ mysql inventory_db -e "SELECT seat_no, status, hold_id FROM show_seats WHERE show_id = 938299; SELECT COUNT(*) AS holds FROM holds WHERE show_id = 938299;"
+seat_no	status	hold_id
+A1	HELD	2764e39f-6358-4dde-9d0d-568e3ee5dc51
+A2	HELD	1cceaf95-4dcf-4140-80d3-ea3c4ba77626
+A3	HELD	e0f44d4d-114b-4830-b7fc-5b0d7fea483c
+A4	HELD	31f37ac8-2e57-40ad-b36c-a10d3da6c5f7
+A5	HELD	3abfcf3a-ef09-4f17-a8d2-d3e9a0b20bcb
+holds
+5
+

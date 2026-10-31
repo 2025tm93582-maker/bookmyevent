@@ -1,0 +1,21 @@
+$ node scripts/challenge3c-saga.mjs
+# 2026-10-31 17:24:04 +0530 | services: all normal
+
+Challenge 3C: saga with compensation (correlation id saga-mvwcf769)
+show 2 with seats A1-A4, booking A1 and A2
+
+POST /bookings: 201
+booking 3dee937a-f2a5-42b0-8ebe-ab49a2c1ea69: CONFIRMED
+saga steps:
+  CHECK OK show 2, amount 4000
+  HOLD_SEATS OK hold 2d8c5319-111b-4e41-b3c0-b3e5ea943390
+  CHARGE_PAYMENT OK payment 54844044-e6ae-4fcf-b213-8e5e5da6a23b
+  CONFIRM_SEATS OK 
+  NOTIFY OK HTTP 201
+
+final state:
+  booking: CONFIRMED
+  payment: SUCCEEDED
+  hold: CONFIRMED, seats: A1 SOLD, A2 SOLD
+
+RESULT: CONSISTENT

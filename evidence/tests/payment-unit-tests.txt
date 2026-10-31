@@ -1,0 +1,21 @@
+
+> payment@1.0.0 test
+> node --test
+
+✔ same body in a different key order gives the same fingerprint (0.660917ms)
+✔ a different amount gives a different fingerprint (0.077792ms)
+✔ the same body on a different path gives a different fingerprint (0.05375ms)
+✔ tok_decline is declined, other tokens are not (0.264208ms)
+✔ gateway is down when the roll is below the fail rate (0.057ms)
+✔ a fail rate of 0 never fails, 1 always fails (0.043875ms)
+✔ currency defaults to INR (0.918708ms)
+✔ rejects zero or negative amounts (0.113875ms)
+✔ rejects other currencies (0.068583ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 67.596625

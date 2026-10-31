@@ -1,0 +1,14 @@
+$ node scripts/challenge1-concurrency.mjs
+# 2026-10-31 17:18:34 +0530 | services: all normal
+
+Challenge 1: concurrency control
+
+Case 1: 20 users want the same seat (capacity 1)
+show 925917, 20 parallel requests
+success: 1, rejected: 19 with SEAT_UNAVAILABLE
+RESULT: PASS
+
+Case 2: 20 users want 5 seats, 4 users per seat (capacity 5)
+show 938299, 20 parallel requests
+success: 5, rejected: 15 with SEAT_UNAVAILABLE
+RESULT: PASS

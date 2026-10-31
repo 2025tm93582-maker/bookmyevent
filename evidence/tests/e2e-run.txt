@@ -1,0 +1,38 @@
+$ node scripts/e2e-booking.mjs
+# 2026-10-31 17:18:06 +0530 | services: all normal
+
+End-to-end test of the main booking transaction (correlation id e2e-mvwc7iph)
+
+1. All services are up
+PASS  catalog is UP
+PASS  inventory is UP
+PASS  booking is UP
+PASS  payment is UP
+PASS  notification is UP
+
+2. Set up an event, a show (GOLD 2500, SILVER 1200) and 8 seats
+PASS  event, show 1 and 8 seats created
+
+3. Book A1 (GOLD) and B1 (SILVER)
+PASS  booking is CONFIRMED (201)
+PASS  BR6: amount calculated by the server is 3700
+PASS  all 5 saga steps are OK
+
+4. Every service agrees
+PASS  Payment: one SUCCEEDED payment of 3700
+PASS  Inventory: hold CONFIRMED, A1 and B1 SOLD
+PASS  Notification: one BOOKING_CONFIRMED message
+
+5. Same request again with the same Idempotency-Key
+PASS  same booking returned and marked as replayed
+PASS  still only one payment
+
+6. Failure paths
+PASS  BR3: seat already sold gives 409 SEAT_UNAVAILABLE
+PASS  declined card gives 402 PAYMENT_DECLINED
+PASS  declined booking is FAILED and A2 is AVAILABLE again
+PASS  BR6: unknown seat gives 422 UNKNOWN_SEATS
+PASS  BR4: 7 seats gives 400 VALIDATION_FAILED
+PASS  missing Idempotency-Key gives 400
+
+RESULT: ALL PASS (20 of 20 checks passed)

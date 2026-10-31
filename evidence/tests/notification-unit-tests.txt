@@ -1,0 +1,18 @@
+
+> notification@1.0.0 test
+> node --test
+
+✔ confirmed template includes event and seats (0.283541ms)
+✔ failed template includes the reason (0.071208ms)
+✔ provider is down only when the roll is below the fail rate (0.046042ms)
+✔ EMAIL needs an email address (0.939ms)
+✔ SMS needs a phone number (0.127083ms)
+✔ unknown template is rejected (0.054417ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 66.104833

@@ -1,0 +1,29 @@
+# 2026-10-31 17:24:50 +0530 | final state of booking 5feb7acf-3a66-4e4e-aac5-c79c087011c6 (show 3) in all three databases
+
+$ mysql booking_db -e "SELECT status, failure_reason FROM bookings WHERE id = '5feb7acf-3a66-4e4e-aac5-c79c087011c6';"
+status	failure_reason
+FAILED	SEAT_CONFIRMATION_FAILED
+
+$ mysql booking_db -e "SELECT step, outcome, detail, created_at FROM saga_steps WHERE booking_id = '5feb7acf-3a66-4e4e-aac5-c79c087011c6' ORDER BY id;"
+step	outcome	detail	created_at
+CHECK	OK	show 3, amount 4000	2026-10-31 17:24:26.233
+HOLD_SEATS	OK	hold 765838a3-5756-4345-b492-ccf6749dee0c	2026-10-31 17:24:26.238
+CHARGE_PAYMENT	OK	payment aa588fd1-8c5c-4a87-8591-1babf79ac1c0	2026-10-31 17:24:26.242
+CONFIRM_SEATS	FAILED	HTTP 500 SIMULATED_FAILURE	2026-10-31 17:24:26.244
+REFUND_PAYMENT	OK	HTTP 200	2026-10-31 17:24:26.246
+RELEASE_SEATS	OK	HTTP 200	2026-10-31 17:24:26.250
+NOTIFY	OK	HTTP 201	2026-10-31 17:24:26.253
+
+$ mysql payment_db -e "SELECT id, booking_id, amount, status, refunded_at FROM payments WHERE booking_id = '5feb7acf-3a66-4e4e-aac5-c79c087011c6';"
+id	booking_id	amount	status	refunded_at
+aa588fd1-8c5c-4a87-8591-1babf79ac1c0	5feb7acf-3a66-4e4e-aac5-c79c087011c6	4000.00	REFUNDED	2026-10-31 17:24:26
+
+$ mysql inventory_db -e "SELECT id, status FROM holds WHERE show_id = 3; SELECT seat_no, status, hold_id FROM show_seats WHERE show_id = 3;"
+id	status
+765838a3-5756-4345-b492-ccf6749dee0c	RELEASED
+seat_no	status	hold_id
+A1	AVAILABLE	NULL
+A2	AVAILABLE	NULL
+A3	AVAILABLE	NULL
+A4	AVAILABLE	NULL
+

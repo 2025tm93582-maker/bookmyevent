@@ -1,0 +1,21 @@
+$ node scripts/challenge3c-saga.mjs
+# 2026-10-31 17:27:05 +0530 | services: payment: PAYMENT_FAIL_RATE=1
+
+Challenge 3C: saga with compensation (correlation id saga-mvwcj2dz)
+show 5 with seats A1-A4, booking A1 and A2
+
+POST /bookings: 503
+booking da978274-f88f-4d95-831b-21110fb54c98: FAILED
+saga steps:
+  CHECK OK show 5, amount 4000
+  HOLD_SEATS OK hold 64f3074e-c199-49ef-8e25-f3aef3b8ba7c
+  CHARGE_PAYMENT FAILED HTTP 503 GATEWAY_UNAVAILABLE
+  RELEASE_SEATS OK HTTP 200
+  NOTIFY OK HTTP 201
+
+final state:
+  booking: FAILED
+  payment: none
+  hold: RELEASED, seats: A1 AVAILABLE, A2 AVAILABLE
+
+RESULT: CONSISTENT

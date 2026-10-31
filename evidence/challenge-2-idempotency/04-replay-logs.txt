@@ -1,0 +1,25 @@
+$ grep 'Idempotent replay' logs/payment.log | grep mvwcbb7h
+# 2026-10-31 17:22:19 +0530 | replay log lines for run mvwcbb7h
+
+{"level":30,"time":1793447463323,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"312d988e-fc49-45b4-82e9-56133adf6f69","idempotencyKey":"seq-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463324,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"a4c196a1-d16f-47af-9966-738415341324","idempotencyKey":"seq-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463326,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"824bde8b-1d42-4811-a556-5443f811bec8","idempotencyKey":"seq-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463342,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"74e86709-3b46-4753-ac5e-e8890501ebfd","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463343,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"6fe65cd8-f75a-4dd2-9fd1-56856b6266f1","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463343,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"8231d318-2351-4b2d-9f2c-1747e4d7feb1","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463343,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"56d202c9-ddb1-419c-970d-7190ec40af67","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463344,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"58f4ba22-9a4f-4d14-9a20-2d5ef3c3aed5","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463344,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"07dd8f9e-ddda-4c53-a06c-36ffd457acd1","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463344,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"111d7c73-572a-4630-b041-3e089ef43018","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463344,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"5150911f-d481-47c4-8039-c62cd6f22740","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463344,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"f75aac06-6f82-4885-ae5c-4d318b240a63","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463345,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"874891bf-2789-47aa-942e-bafde3e2e197","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463345,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"a9d4d768-d534-4ecd-a509-9e1cee0c530f","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463346,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"80e2ccad-437d-4568-ad72-84447e29b54c","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463346,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"c82685fb-f0bc-4978-8e58-de3eaa4c56fb","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463346,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"309287f6-add6-4f7a-ac0a-073ff7fd5e8c","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463347,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"2526328c-fe62-4d95-a31c-69e15b5aeda6","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463347,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"5439179b-4ecf-4475-b2e4-465c33b9e6ea","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463347,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"df32a607-45d5-4240-bbfb-0487657aa37e","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463347,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"89f8591c-9740-4c11-90f5-31222de38830","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}
+{"level":30,"time":1793447463347,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"14e44c22-46c2-4a4b-ba6e-99f5652abdc6","idempotencyKey":"burst-mvwcbb7h","msg":"Idempotent replay"}

@@ -1,0 +1,14 @@
+$ node scripts/challenge1-concurrency.mjs
+# 2026-10-31 17:18:58 +0530 | services: inventory: HOLD_STRATEGY=naive
+
+Challenge 1: concurrency control
+
+Case 1: 20 users want the same seat (capacity 1)
+show 998740, 20 parallel requests
+success: 20, rejected: 0
+RESULT: FAIL
+
+Case 2: 20 users want 5 seats, 4 users per seat (capacity 5)
+show 982045, 20 parallel requests
+success: 20, rejected: 0
+RESULT: FAIL
