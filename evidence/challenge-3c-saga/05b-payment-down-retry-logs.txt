@@ -1,26 +1,20 @@
-$ corrlogs saga-mvwcj2dz
-# 2026-10-31 17:27:20 +0530 | services: payment: PAYMENT_FAIL_RATE=1
+requests with correlation id saga-mvwcj2dz, from all 5 services, in time order
 
-# every log line containing saga-mvwcj2dz, from all 5 services, in time order
-catalog: {"level":30,"time":1793447825134,"service":"catalog","req":{"method":"POST","url":"/api/v1/events"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":201},"responseTime":3,"msg":"request completed"}
-catalog: {"level":30,"time":1793447825140,"service":"catalog","req":{"method":"POST","url":"/api/v1/events/5/shows"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":201},"responseTime":2,"msg":"request completed"}
-inventory: {"level":30,"time":1793447825143,"service":"inventory","req":{"method":"POST","url":"/api/v1/shows/5/seats"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":201},"responseTime":1,"msg":"request completed"}
-catalog: {"level":30,"time":1793447825147,"service":"catalog","req":{"method":"GET","url":"/api/v1/shows/5"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":200},"responseTime":1,"msg":"request completed"}
-inventory: {"level":30,"time":1793447825148,"service":"inventory","req":{"method":"GET","url":"/api/v1/shows/5/seats"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":200},"responseTime":0,"msg":"request completed"}
-inventory: {"level":30,"time":1793447825152,"service":"inventory","req":{"method":"POST","url":"/api/v1/holds"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":201},"responseTime":1,"msg":"request completed"}
-payment: {"level":40,"time":1793447825157,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"saga-mvwcj2dz","code":"GATEWAY_UNAVAILABLE","status":503,"msg":"Payment gateway is temporarily unavailable"}
-payment: {"level":50,"time":1793447825158,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":503},"responseTime":3,"msg":"request completed"}
-booking: {"level":40,"time":1793447825158,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"saga-mvwcj2dz","bookingId":"da978274-f88f-4d95-831b-21110fb54c98","attempt":1,"result":"HTTP 503 GATEWAY_UNAVAILABLE","msg":"Charge failed, retrying with the same key"}
-payment: {"level":40,"time":1793447825367,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"saga-mvwcj2dz","code":"GATEWAY_UNAVAILABLE","status":503,"msg":"Payment gateway is temporarily unavailable"}
-payment: {"level":50,"time":1793447825370,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":503},"responseTime":7,"msg":"request completed"}
-booking: {"level":40,"time":1793447825370,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"saga-mvwcj2dz","bookingId":"da978274-f88f-4d95-831b-21110fb54c98","attempt":2,"result":"HTTP 503 GATEWAY_UNAVAILABLE","msg":"Charge failed, retrying with the same key"}
-payment: {"level":40,"time":1793447825779,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"saga-mvwcj2dz","code":"GATEWAY_UNAVAILABLE","status":503,"msg":"Payment gateway is temporarily unavailable"}
-payment: {"level":50,"time":1793447825782,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":503},"responseTime":7,"msg":"request completed"}
-inventory: {"level":30,"time":1793447825794,"service":"inventory","req":{"method":"POST","url":"/api/v1/holds/64f3074e-c199-49ef-8e25-f3aef3b8ba7c/release"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":200},"responseTime":7,"msg":"request completed"}
-notification: {"level":30,"time":1793447825805,"service":"notification","req":{"method":"POST","url":"/api/v1/notifications"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":201},"responseTime":4,"msg":"request completed"}
-booking: {"level":40,"time":1793447825807,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"saga-mvwcj2dz","code":"PAYMENT_UNAVAILABLE","status":503,"msg":"Payment is unavailable; seats released"}
-booking: {"level":50,"time":1793447825809,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":503},"responseTime":664,"msg":"request completed"}
-booking: {"level":30,"time":1793447825817,"service":"booking","req":{"method":"GET","url":"/api/v1/bookings/da978274-f88f-4d95-831b-21110fb54c98"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":200},"responseTime":3,"msg":"request completed"}
-payment: {"level":30,"time":1793447825821,"service":"payment","req":{"method":"GET","url":"/api/v1/payments?bookingId=da978274-f88f-4d95-831b-21110fb54c98"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":200},"responseTime":1,"msg":"request completed"}
-inventory: {"level":30,"time":1793447825823,"service":"inventory","req":{"method":"GET","url":"/api/v1/holds/64f3074e-c199-49ef-8e25-f3aef3b8ba7c"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":200},"responseTime":1,"msg":"request completed"}
-inventory: {"level":30,"time":1793447825826,"service":"inventory","req":{"method":"GET","url":"/api/v1/shows/5/seats"},"correlationId":"saga-mvwcj2dz","res":{"statusCode":200},"responseTime":1,"msg":"request completed"}
+17:27:05.134  catalog      POST /events                                      201
+17:27:05.140  catalog      POST /events/5/shows                              201
+17:27:05.143  inventory    POST /shows/5/seats                               201
+17:27:05.147  catalog      GET  /shows/5                                     200
+17:27:05.148  inventory    GET  /shows/5/seats                               200
+17:27:05.152  inventory    POST /holds                                       201
+17:27:05.158  payment      POST /payments                                    503
+17:27:05.370  payment      POST /payments                                    503
+17:27:05.782  payment      POST /payments                                    503
+17:27:05.794  inventory    POST /holds/64f3074e…/release                     200
+17:27:05.805  notification POST /notifications                               201
+17:27:05.809  booking      POST /bookings                                    503
+17:27:05.817  booking      GET  /bookings/da978274…                          200
+17:27:05.821  payment      GET  /payments?bookingId=da978274…                200
+17:27:05.823  inventory    GET  /holds/64f3074e…                             200
+17:27:05.826  inventory    GET  /shows/5/seats                               200
+
+16 requests

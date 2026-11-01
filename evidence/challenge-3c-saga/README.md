@@ -64,14 +64,15 @@ Every file starts with the command, the time it ran and which failure switches w
 |---|---|---|
 | `01-happy-path.txt` | all services normal | `201 CONFIRMED`; payment SUCCEEDED, hold CONFIRMED, seats SOLD — CONSISTENT |
 | `02-failure-at-step-3.txt` | **Inventory `FAULT_CONFIRM_FAIL=true`** | `502 BOOKING_FAILED`; steps below; payment **REFUNDED**, hold **RELEASED**, seats **AVAILABLE** — CONSISTENT |
-| `03-failure-correlated-logs.txt` | same run | all 18 log lines for `saga-mvwcfnrk` across 5 services, in time order |
+| `03-failure-correlated-logs.txt` | same run, `node scripts/correlate-logs.mjs saga-mvwcfnrk` | all 16 requests with that correlation id across the 5 services, in time order: hold 201, charge 201, confirm **500**, refund 200, release 200, then `POST /bookings` 502 |
 | `04-failure-db-state.txt` | same run, read from all three databases | `booking_db`: FAILED / SEAT_CONFIRMATION_FAILED and 7 `saga_steps` rows with ms timestamps; `payment_db`: payment REFUNDED; `inventory_db`: hold RELEASED, seats AVAILABLE |
 | `05-payment-down.txt` | Payment `PAYMENT_FAIL_RATE=1` | `503 PAYMENT_UNAVAILABLE`; only step 1 compensated (seats released), no payment taken — CONSISTENT |
-| `05b-payment-down-retry-logs.txt` | same run | Booking log: charge attempts 1 and 2 failed → retried with the same key; 3 charge calls, 0 payments |
+| `05b-payment-down-retry-logs.txt` | same run, `node scripts/correlate-logs.mjs saga-mvwcj2dz` | three `POST /payments` calls, all 503, about 0.2 s then 0.4 s apart (backoff), then the hold is released; 0 payments |
 | `06-notification-down.txt` | Notification `NOTIFY_FAIL_RATE=1` | `201 CONFIRMED`; `NOTIFY FAILED HTTP 503`; booking stays CONFIRMED — CONSISTENT |
 | `failure-at-step-3.png`, `failure-db-state.png` | screenshots of `02` and `04` | command, output, timestamp |
 | `workbench-db-state.png` | MySQL Workbench, same booking | one grid across the three databases: booking FAILED, payment REFUNDED, hold RELEASED, A1 and A2 AVAILABLE |
 | `happy-path.png`, `payment-down.png`, `notification-down.png` | screenshots of `01`, `05` and `06` | command, output, timestamp |
+| `failure-correlated-logs.png`, `payment-down-retry-logs.png` | screenshots of `03` and `05b` | command, output, timestamp |
 
 **The forced failure at step 3 (`02`, `04`):**
 

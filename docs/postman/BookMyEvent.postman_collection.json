@@ -1,0 +1,341 @@
+{
+  "info": {
+    "name": "BookMyEvent",
+    "description": "One-off calls for the demo. Run `bash scripts/demo/setup.sh` first and set the collection variable showId to the id it prints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "catalog",
+      "value": "http://localhost:3001"
+    },
+    {
+      "key": "inventory",
+      "value": "http://localhost:3002"
+    },
+    {
+      "key": "booking",
+      "value": "http://localhost:3003"
+    },
+    {
+      "key": "payment",
+      "value": "http://localhost:3004"
+    },
+    {
+      "key": "notification",
+      "value": "http://localhost:3005"
+    },
+    {
+      "key": "showId",
+      "value": ""
+    },
+    {
+      "key": "bookingId",
+      "value": ""
+    },
+    {
+      "key": "failedBookingId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Catalog health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{catalog}}/health"
+          }
+        },
+        {
+          "name": "Inventory health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{inventory}}/health"
+          }
+        },
+        {
+          "name": "Booking health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{booking}}/health"
+          }
+        },
+        {
+          "name": "Payment health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{payment}}/health"
+          }
+        },
+        {
+          "name": "Notification health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{notification}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Booking",
+      "item": [
+        {
+          "name": "1. Book A1 and A2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "demo-{{showId}}-1"
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "demo-{{showId}}-1"
+              }
+            ],
+            "url": "{{booking}}/api/v1/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"showId\": {{showId}},\n  \"seats\": [\n    \"A1\",\n    \"A2\"\n  ],\n  \"customerEmail\": \"demo@example.com\",\n  \"cardToken\": \"tok_visa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Happy path: 201 CONFIRMED, amount 5000 worked out by the server (BR6)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set(\"bookingId\", body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Same booking again (replay)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "demo-{{showId}}-1"
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "demo-{{showId}}-1"
+              }
+            ],
+            "url": "{{booking}}/api/v1/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"showId\": {{showId}},\n  \"seats\": [\n    \"A1\",\n    \"A2\"\n  ],\n  \"customerEmail\": \"demo@example.com\",\n  \"cardToken\": \"tok_visa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Same key and body: the stored 201 comes back with the header Idempotent-Replayed: true."
+          }
+        },
+        {
+          "name": "3. Same key, different seats",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "demo-{{showId}}-1"
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "demo-{{showId}}-1"
+              }
+            ],
+            "url": "{{booking}}/api/v1/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"showId\": {{showId}},\n  \"seats\": [\n    \"A3\"\n  ],\n  \"customerEmail\": \"demo@example.com\",\n  \"cardToken\": \"tok_visa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Same key, different body: 422 IDEMPOTENCY_KEY_REUSED."
+          }
+        },
+        {
+          "name": "4. Seat already sold",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "demo-{{showId}}-4"
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "demo-{{showId}}-4"
+              }
+            ],
+            "url": "{{booking}}/api/v1/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"showId\": {{showId}},\n  \"seats\": [\n    \"A1\"\n  ],\n  \"customerEmail\": \"demo@example.com\",\n  \"cardToken\": \"tok_visa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "A1 is SOLD: 409 SEAT_UNAVAILABLE (BR3)."
+          }
+        },
+        {
+          "name": "5. Declined card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "demo-{{showId}}-5"
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "demo-{{showId}}-5"
+              }
+            ],
+            "url": "{{booking}}/api/v1/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"showId\": {{showId}},\n  \"seats\": [\n    \"B1\"\n  ],\n  \"customerEmail\": \"demo@example.com\",\n  \"cardToken\": \"tok_decline\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "402 PAYMENT_DECLINED; the saga releases B1 again."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const id = body.error && body.error.details && body.error.details[0] && body.error.details[0].bookingId;",
+                  "if (id) pm.collectionVariables.set(\"failedBookingId\", id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. Missing Idempotency-Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{booking}}/api/v1/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"showId\": {{showId}},\n  \"seats\": [\n    \"B2\"\n  ],\n  \"customerEmail\": \"demo@example.com\",\n  \"cardToken\": \"tok_visa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "400 IDEMPOTENCY_KEY_REQUIRED."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Check state",
+      "item": [
+        {
+          "name": "Booking",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{booking}}/api/v1/bookings/{{bookingId}}"
+          }
+        },
+        {
+          "name": "Failed booking",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{booking}}/api/v1/bookings/{{failedBookingId}}"
+          }
+        },
+        {
+          "name": "Payments for booking",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{payment}}/api/v1/payments?bookingId={{bookingId}}"
+          }
+        },
+        {
+          "name": "Notifications for booking",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{notification}}/api/v1/notifications?bookingId={{bookingId}}"
+          }
+        },
+        {
+          "name": "Seats of show",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{inventory}}/api/v1/shows/{{showId}}/seats"
+          }
+        }
+      ]
+    }
+  ]
+}

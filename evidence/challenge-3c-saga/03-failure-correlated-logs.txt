@@ -1,22 +1,20 @@
-$ corrlogs saga-mvwcfnrk
-# 2026-10-31 17:24:42 +0530 | services: inventory: FAULT_CONFIRM_FAIL=true
+requests with correlation id saga-mvwcfnrk, from all 5 services, in time order
 
-# every log line containing saga-mvwcfnrk, from all 5 services, in time order
-catalog: {"level":30,"time":1793447666215,"service":"catalog","req":{"method":"POST","url":"/api/v1/events"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":201},"responseTime":3,"msg":"request completed"}
-catalog: {"level":30,"time":1793447666221,"service":"catalog","req":{"method":"POST","url":"/api/v1/events/3/shows"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":201},"responseTime":3,"msg":"request completed"}
-inventory: {"level":30,"time":1793447666226,"service":"inventory","req":{"method":"POST","url":"/api/v1/shows/3/seats"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":201},"responseTime":4,"msg":"request completed"}
-catalog: {"level":30,"time":1793447666230,"service":"catalog","req":{"method":"GET","url":"/api/v1/shows/3"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":200},"responseTime":1,"msg":"request completed"}
-inventory: {"level":30,"time":1793447666231,"service":"inventory","req":{"method":"GET","url":"/api/v1/shows/3/seats"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":200},"responseTime":0,"msg":"request completed"}
-inventory: {"level":30,"time":1793447666237,"service":"inventory","req":{"method":"POST","url":"/api/v1/holds"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":201},"responseTime":3,"msg":"request completed"}
-payment: {"level":30,"time":1793447666242,"service":"payment","req":{"method":"POST","url":"/api/v1/payments"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":201},"responseTime":3,"msg":"request completed"}
-inventory: {"level":40,"time":1793447666243,"service":"inventory","req":{"method":"POST","url":"/api/v1/holds/765838a3-5756-4345-b492-ccf6749dee0c/confirm"},"correlationId":"saga-mvwcfnrk","code":"SIMULATED_FAILURE","status":500,"msg":"Seat confirmation failed (FAULT_CONFIRM_FAIL is on)"}
-inventory: {"level":50,"time":1793447666244,"service":"inventory","req":{"method":"POST","url":"/api/v1/holds/765838a3-5756-4345-b492-ccf6749dee0c/confirm"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":500},"responseTime":1,"msg":"request completed"}
-payment: {"level":30,"time":1793447666246,"service":"payment","req":{"method":"POST","url":"/api/v1/payments/aa588fd1-8c5c-4a87-8591-1babf79ac1c0/refund"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":200},"responseTime":1,"msg":"request completed"}
-inventory: {"level":30,"time":1793447666249,"service":"inventory","req":{"method":"POST","url":"/api/v1/holds/765838a3-5756-4345-b492-ccf6749dee0c/release"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":200},"responseTime":2,"msg":"request completed"}
-notification: {"level":30,"time":1793447666252,"service":"notification","req":{"method":"POST","url":"/api/v1/notifications"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":201},"responseTime":1,"msg":"request completed"}
-booking: {"level":40,"time":1793447666253,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"saga-mvwcfnrk","code":"BOOKING_FAILED","status":502,"msg":"Seats could not be confirmed; payment refunded and seats released"}
-booking: {"level":50,"time":1793447666254,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":502},"responseTime":26,"msg":"request completed"}
-booking: {"level":30,"time":1793447666256,"service":"booking","req":{"method":"GET","url":"/api/v1/bookings/5feb7acf-3a66-4e4e-aac5-c79c087011c6"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":200},"responseTime":1,"msg":"request completed"}
-payment: {"level":30,"time":1793447666257,"service":"payment","req":{"method":"GET","url":"/api/v1/payments?bookingId=5feb7acf-3a66-4e4e-aac5-c79c087011c6"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":200},"responseTime":0,"msg":"request completed"}
-inventory: {"level":30,"time":1793447666258,"service":"inventory","req":{"method":"GET","url":"/api/v1/holds/765838a3-5756-4345-b492-ccf6749dee0c"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":200},"responseTime":1,"msg":"request completed"}
-inventory: {"level":30,"time":1793447666259,"service":"inventory","req":{"method":"GET","url":"/api/v1/shows/3/seats"},"correlationId":"saga-mvwcfnrk","res":{"statusCode":200},"responseTime":0,"msg":"request completed"}
+17:24:26.215  catalog      POST /events                                      201
+17:24:26.221  catalog      POST /events/3/shows                              201
+17:24:26.226  inventory    POST /shows/3/seats                               201
+17:24:26.230  catalog      GET  /shows/3                                     200
+17:24:26.231  inventory    GET  /shows/3/seats                               200
+17:24:26.237  inventory    POST /holds                                       201
+17:24:26.242  payment      POST /payments                                    201
+17:24:26.244  inventory    POST /holds/765838a3…/confirm                     500
+17:24:26.246  payment      POST /payments/aa588fd1…/refund                   200
+17:24:26.249  inventory    POST /holds/765838a3…/release                     200
+17:24:26.252  notification POST /notifications                               201
+17:24:26.254  booking      POST /bookings                                    502
+17:24:26.256  booking      GET  /bookings/5feb7acf…                          200
+17:24:26.257  payment      GET  /payments?bookingId=5feb7acf…                200
+17:24:26.258  inventory    GET  /holds/765838a3…                             200
+17:24:26.259  inventory    GET  /shows/3/seats                               200
+
+16 requests
