@@ -13,6 +13,13 @@ services:
       - ./docker/mysql:/docker-entrypoint-initdb.d:ro
     ports:
       - "3307:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
 
   catalog:
     build: ./services/catalog
@@ -25,8 +32,16 @@ services:
       DB_NAME: catalog_db
     ports:
       - "3001:3001"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
 
   inventory:
     build: ./services/inventory
@@ -41,8 +56,64 @@ services:
       FAULT_CONFIRM_FAIL: ${FAULT_CONFIRM_FAIL:-false}
     ports:
       - "3002:3002"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3002/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  payment:
+    build: ./services/payment
+    environment:
+      PORT: 3004
+      SERVICE_NAME: payment
+      DB_HOST: mysql
+      DB_USER: payment_user
+      DB_PASSWORD: ${PAYMENT_DB_PASSWORD}
+      DB_NAME: payment_db
+      PAYMENT_DELAY_MS: ${PAYMENT_DELAY_MS:-0}
+      PAYMENT_FAIL_RATE: ${PAYMENT_FAIL_RATE:-0}
+    ports:
+      - "3004:3004"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3004/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  notification:
+    build: ./services/notification
+    environment:
+      PORT: 3005
+      SERVICE_NAME: notification
+      DB_HOST: mysql
+      DB_USER: notification_user
+      DB_PASSWORD: ${NOTIFICATION_DB_PASSWORD}
+      DB_NAME: notification_db
+      NOTIFY_DELAY_MS: ${NOTIFY_DELAY_MS:-0}
+      NOTIFY_FAIL_RATE: ${NOTIFY_FAIL_RATE:-0}
+    ports:
+      - "3005:3005"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3005/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
 
   booking:
     build: ./services/booking
@@ -59,44 +130,24 @@ services:
       NOTIFICATION_URL: http://notification:3005/api/v1
     ports:
       - "3003:3003"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3003/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     depends_on:
-      - mysql
-      - catalog
-      - inventory
-      - payment
-      - notification
-
-  payment:
-    build: ./services/payment
-    environment:
-      PORT: 3004
-      SERVICE_NAME: payment
-      DB_HOST: mysql
-      DB_USER: payment_user
-      DB_PASSWORD: ${PAYMENT_DB_PASSWORD}
-      DB_NAME: payment_db
-      PAYMENT_DELAY_MS: ${PAYMENT_DELAY_MS:-0}
-      PAYMENT_FAIL_RATE: ${PAYMENT_FAIL_RATE:-0}
-    ports:
-      - "3004:3004"
-    depends_on:
-      - mysql
-
-  notification:
-    build: ./services/notification
-    environment:
-      PORT: 3005
-      SERVICE_NAME: notification
-      DB_HOST: mysql
-      DB_USER: notification_user
-      DB_PASSWORD: ${NOTIFICATION_DB_PASSWORD}
-      DB_NAME: notification_db
-      NOTIFY_DELAY_MS: ${NOTIFY_DELAY_MS:-0}
-      NOTIFY_FAIL_RATE: ${NOTIFY_FAIL_RATE:-0}
-    ports:
-      - "3005:3005"
-    depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+      catalog:
+        condition: service_healthy
+      inventory:
+        condition: service_healthy
+      payment:
+        condition: service_healthy
+      notification:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   mysql-data:
