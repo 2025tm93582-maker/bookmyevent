@@ -1,0 +1,228 @@
+akshbabbar@Akshs-MacBook-Pro Assignment 2 % cd "/Users/akshbabbar/Desktop/BITS/Scalable Services/Assignments/bookmyevent" && bash scripts/stop-all.sh
+akshbabbar@Akshs-MacBook-Pro bookmyevent % cd "/Users/akshbabbar/Desktop/BITS/Scalable Services/Assignment 2/bookmyevent" && cp .env.example .env && open -e .env
+akshbabbar@Akshs-MacBook-Pro bookmyevent % docker --version && docker compose version
+Docker version 29.5.3, build d1c06ef
+Docker Compose version v5.1.4
+akshbabbar@Akshs-MacBook-Pro bookmyevent % docker compose up --build
+[+] up 13/13
+ ✔ Image mysql:8.4 Pulled                                                                                          29.0s
+[+] Building 17.0s (50/50) FINISHED                                                                                     
+ => [internal] load local bake definitions                                                                         0.0s
+ => => reading from stdin 2.91kB                                                                                   0.0s
+ => [payment internal] load build definition from Dockerfile                                                       0.0s
+ => => transferring dockerfile: 255B                                                                               0.0s
+ => [notification internal] load build definition from Dockerfile                                                  0.0s
+ => => transferring dockerfile: 255B                                                                               0.0s
+ => [inventory internal] load build definition from Dockerfile                                                     0.0s
+ => => transferring dockerfile: 255B                                                                               0.0s
+ => [booking internal] load build definition from Dockerfile                                                       0.0s
+ => => transferring dockerfile: 255B                                                                               0.0s
+ => [catalog internal] load build definition from Dockerfile                                                       0.0s
+ => => transferring dockerfile: 255B                                                                               0.0s
+ => [catalog internal] load metadata for docker.io/library/node:22-alpine                                          3.0s
+ => [auth] library/node:pull token for registry-1.docker.io                                                        0.0s
+ => [payment internal] load .dockerignore                                                                          0.0s
+ => => transferring context: 95B                                                                                   0.0s
+ => [notification internal] load .dockerignore                                                                     0.0s
+ => => transferring context: 95B                                                                                   0.0s
+ => [catalog internal] load .dockerignore                                                                          0.0s
+ => => transferring context: 95B                                                                                   0.0s
+ => [booking internal] load .dockerignore                                                                          0.0s
+ => => transferring context: 95B                                                                                   0.0s
+ => [inventory internal] load .dockerignore                                                                        0.0s
+ => => transferring context: 95B                                                                                   0.0s
+ => [catalog 1/6] FROM docker.io/library/node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60c  6.6s
+ => => resolve docker.io/library/node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844  0.0s
+ => => sha256:f04c63730cb349b2c5fcd49010e45ce74ed3caa240639ea8b248f42827a75249 444B / 444B                         0.3s
+ => => sha256:e51951d495a7da196c9ad4a10e58817f7e8ae25e5ca4564911ab879377fba153 1.26MB / 1.26MB                     0.7s
+ => => sha256:d3531b7a4f217bdc3426c57bcff84c170f086f456a39689d4a615c6d026c4be0 4.19MB / 4.19MB                     1.8s
+ => => sha256:5c8e282ceef79775f7764a7ebcc588c0ae1d03bd53fefafb20015a2902cafcce 55.69MB / 55.69MB                   6.0s
+ => => extracting sha256:d3531b7a4f217bdc3426c57bcff84c170f086f456a39689d4a615c6d026c4be0                          0.1s
+ => => extracting sha256:5c8e282ceef79775f7764a7ebcc588c0ae1d03bd53fefafb20015a2902cafcce                          0.5s
+ => => extracting sha256:e51951d495a7da196c9ad4a10e58817f7e8ae25e5ca4564911ab879377fba153                          0.0s
+ => => extracting sha256:f04c63730cb349b2c5fcd49010e45ce74ed3caa240639ea8b248f42827a75249                          0.0s
+ => [booking internal] load build context                                                                          0.0s
+ => => transferring context: 110.76kB                                                                              0.0s
+ => [payment internal] load build context                                                                          0.0s
+ => => transferring context: 91.98kB                                                                               0.0s
+ => [notification internal] load build context                                                                     0.0s
+ => => transferring context: 84.68kB                                                                               0.0s
+ => [catalog internal] load build context                                                                          0.0s
+ => => transferring context: 96.25kB                                                                               0.0s
+ => [inventory internal] load build context                                                                        0.0s
+ => => transferring context: 95.95kB                                                                               0.0s
+ => [notification 2/6] WORKDIR /app                                                                                0.1s
+ => [payment 3/6] COPY package.json package-lock.json ./                                                           0.0s
+ => [inventory 3/6] COPY package.json package-lock.json ./                                                         0.0s
+ => [booking 3/6] COPY package.json package-lock.json ./                                                           0.0s
+ => [catalog 3/6] COPY package.json package-lock.json ./                                                           0.0s
+ => [notification 3/6] COPY package.json package-lock.json ./                                                      0.0s
+ => [payment 4/6] RUN npm ci --omit=dev                                                                            5.9s
+ => [catalog 4/6] RUN npm ci --omit=dev                                                                            4.6s
+ => [notification 4/6] RUN npm ci --omit=dev                                                                       5.5s
+ => [inventory 4/6] RUN npm ci --omit=dev                                                                          5.0s
+ => [booking 4/6] RUN npm ci --omit=dev                                                                            4.5s
+ => [booking 5/6] COPY server.js openapi.yaml ./                                                                   0.0s
+ => [booking 6/6] COPY src ./src                                                                                   0.0s
+ => [booking] exporting to image                                                                                   1.1s
+ => => exporting layers                                                                                            0.8s
+ => => exporting manifest sha256:023d06b1f05b6bfeefdd75f2d3625f946bbfc7fa2940843db43e11d5c4de490d                  0.0s
+ => => exporting config sha256:698913a1683c263498fbb5e02e2cbe5882db857c49e1a3f87d473cbb5b314b27                    0.0s
+ => => exporting attestation manifest sha256:13840042fab9bb95130216db30fe366b06d3920fdba5ae95bc845fe73ebb45fb      0.0s
+ => => exporting manifest list sha256:eea80c678fd0c024bfbd21231c1e10d899d9eb8385b9467abb6fda56998ec49a             0.0s
+ => => naming to docker.io/library/bookmyevent-booking:latest                                                      0.0s
+ => => unpacking to docker.io/library/bookmyevent-booking:latest                                                   0.3s
+ => [catalog 5/6] COPY server.js openapi.yaml ./                                                                   0.0s
+ => [catalog 6/6] COPY src ./src                                                                                   0.0s
+ => [catalog] exporting to image                                                                                   0.9s
+ => => exporting layers                                                                                            0.7s
+ => => exporting manifest sha256:694c52a92b82dd71954316f9945f9bd425adebb138c2ebd8816edc3696ae7bec                  0.0s
+ => => exporting config sha256:c0b5fb6c25de0c4815549f9c61c983c2456600e511bbd44a61a5980660be6e1f                    0.0s
+ => => exporting attestation manifest sha256:015fd7ddea4dd770629df8455fafd502b1cbac1772d69f84d14995602aa7aa8c      0.0s
+ => => exporting manifest list sha256:9a8f70e09e612c0210a0dc5d98b5bafeea394cff9b64f78e9f584ddad01ce479             0.0s
+ => => naming to docker.io/library/bookmyevent-catalog:latest                                                      0.0s
+ => => unpacking to docker.io/library/bookmyevent-catalog:latest                                                   0.2s
+ => [inventory 5/6] COPY server.js openapi.yaml ./                                                                 0.0s
+ => [inventory 6/6] COPY src ./src                                                                                 0.0s
+ => [inventory] exporting to image                                                                                 0.9s
+ => => exporting layers                                                                                            0.7s
+ => => exporting manifest sha256:a9a1918d56c891abfd6c9d64891575d63318ba7f39ac035dce4c5e78bad36e5e                  0.0s
+ => => exporting config sha256:43f435d06df49070a0aa1a1f62e191c90a4299ccbd1457f5446d08acc1e643c2                    0.0s
+ => => exporting attestation manifest sha256:7deeb3f370e91b0087d939cee9a95c2ca5bb9f8d324f0f3855d1af5215f90a81      0.0s
+ => => exporting manifest list sha256:960b272aad9346a6e49b8f4adc18c28ef3e3754b7e19ccbe3e417c75185efcba             0.0s
+ => => naming to docker.io/library/bookmyevent-inventory:latest                                                    0.0s
+ => => unpacking to docker.io/library/bookmyevent-inventory:latest                                                 0.2s
+ => [notification 5/6] COPY server.js openapi.yaml ./                                                              0.0s
+ => [notification 6/6] COPY src ./src                                                                              0.0s
+ => [notification] exporting to image                                                                              0.9s
+ => => exporting layers                                                                                            0.7s
+ => => exporting manifest sha256:66dc42b8e2b55188ea9ab9c5cd6a15e81c5991e96dc353ec822d274a465a5a97                  0.0s
+ => => exporting config sha256:f1ed755ad4e89c3542bda86386410223fa54d46d9dc5d95a82297807bdf4c16b                    0.0s
+ => => exporting attestation manifest sha256:908bb0726ed08e894c62489f81c20d9d99f4c1da94e10c5f55253bd035221c92      0.0s
+ => => exporting manifest list sha256:9f0b63737f0d0b4e445bf9c3dcb2290d68db03c0a1791774070469dffeca6c57             0.0s
+ => => naming to docker.io/library/bookmyevent-notification:latest                                                 0.0s
+ => => unpacking to docker.io/library/bookmyevent-notification:latest                                              0.2s
+ => [booking] resolving provenance for metadata file                                                               0.0s
+ => [catalog] resolving provenance for metadata file                                                               0.0s
+ => [payment 5/6] COPY server.js openapi.yaml ./                                                                   0.0s
+ => [payment 6/6] COPY src ./src                                                                                   0.0s
+ => [payment] exporting to image                                                                                   0.9s
+ => => exporting layers                                                                                            0.7s
+ => => exporting manifest sha256:6c99af351a0652cd5d64dd25a10908410266dbe91720bcc56240558c11369219                  0.0s
+ => => exporting config sha256:0d45f2cc0d01106151bc4afc6a5ac2b5cc7c018b771b78e3c3e6d37e4717b981                    0.0s
+ => => exporting attestation manifest sha256:c61679dd158997c64918497778b086ac1d95bb4318e2b1369700c1a2bc075ff1      0.0s
+ => => exporting manifest list sha256:3f15844dcd1d60d72ddd464a92fb53eaacfdbc39b8c25b4a0cc23813aced7f37             0.0s
+ => => naming to docker.io/library/bookmyevent-payment:latest                                                      0.0s
+ => => unpacking to docker.io/library/bookmyevent-payment:latest                                                   0.2s
+ => [inventory] resolving provenance for metadata file                                                             0.0s
+[+] up 26/26ation] resolving provenance for metadata file                                                          0.0s
+ ✔ Image mysql:8.4                      Pulled                                                                     29.0s
+ ✔ Image bookmyevent-booking            Built                                                                      17.0s
+ ✔ Image bookmyevent-payment            Built                                                                      17.0s
+ ✔ Image bookmyevent-notification       Built                                                                      17.0s
+ ✔ Image bookmyevent-catalog            Built                                                                      17.0s
+ ✔ Image bookmyevent-inventory          Built                                                                      17.0s
+ ✔ Network bookmyevent_default          Created                                                                     0.0s
+ ✔ Volume bookmyevent_mysql-data        Created                                                                     0.0s
+ ✔ Container bookmyevent-mysql-1        Created                                                                     0.1s
+ ✔ Container bookmyevent-notification-1 Created                                                                     0.0s
+ ✔ Container bookmyevent-inventory-1    Created                                                                     0.0s
+ ✔ Container bookmyevent-payment-1      Created                                                                     0.0s
+ ✔ Container bookmyevent-catalog-1      Created                                                                     0.0s
+ ✔ Container bookmyevent-booking-1      Created                                                                     0.0s
+Attaching to booking-1, catalog-1, inventory-1, mysql-1, notification-1, payment-1
+mysql-1  | 2026-11-01 13:05:55+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.13-1.el9 started.
+mysql-1  | 2026-11-01 13:05:55+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+mysql-1  | 2026-11-01 13:05:55+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.13-1.el9 started.
+mysql-1  | 2026-11-01 13:05:55+00:00 [Note] [Entrypoint]: Initializing database files
+mysql-1  | 2026-11-01T13:05:55.471402Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+mysql-1  | 2026-11-01T13:05:55.472018Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.4.13) initializing of server in progress as process 80
+mysql-1  | 2026-11-01T13:05:55.472019Z 0 [System] [MY-015150] [Server] Server version with update: '8.4.13.0'
+mysql-1  | 2026-11-01T13:05:55.476738Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+notification-1  | {"level":30,"time":1793538355505,"service":"notification","port":3005,"msg":"notification service listening"}
+payment-1       | {"level":30,"time":1793538355505,"service":"payment","port":3004,"msg":"payment service listening"}
+payment-1       | {"level":40,"time":1793538355512,"service":"payment","attempt":1,"reason":"connect ECONNREFUSED 172.18.0.2:3306","msg":"Database not ready, retrying"}
+notification-1  | {"level":40,"time":1793538355512,"service":"notification","attempt":1,"reason":"connect ECONNREFUSED 172.18.0.2:3306","msg":"Database not ready, retrying"}
+
+
+catalog-1       | {"level":30,"time":1793538355521,"service":"catalog","port":3001,"msg":"catalog service listening"}
+catalog-1       | {"level":40,"time":1793538355528,"service":"catalog","attempt":1,"reason":"connect ECONNREFUSED 172.18.0.2:3306","msg":"Database not ready, retrying"}
+inventory-1     | {"level":30,"time":1793538355533,"service":"inventory","port":3002,"msg":"inventory service listening"}
+inventory-1     | {"level":40,"time":1793538355538,"service":"inventory","attempt":1,"reason":"connect ECONNREFUSED 172.18.0.2:3306","msg":"Database not ready, retrying"}
+mysql-1         | 2026-11-01T13:05:55.548500Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+booking-1       | {"level":30,"time":1793538355630,"service":"booking","port":3003,"msg":"booking service listening"}
+booking-1       | {"level":40,"time":1793538355636,"service":"booking","attempt":1,"reason":"connect ECONNREFUSED 172.18.0.2:3306","msg":"Database not ready, retrying"}
+mysql-1         | 2026-11-01T13:05:55.861896Z 6 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+mysql-1         | 2026-11-01T13:05:57.290629Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
+mysql-1         | 2026-11-01 13:05:57+00:00 [Note] [Entrypoint]: Database files initialized
+mysql-1         | 2026-11-01 13:05:57+00:00 [Note] [Entrypoint]: Starting temporary server
+mysql-1         | 2026-11-01T13:05:57.340017Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+mysql-1         | 2026-11-01T13:05:57.479594Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.13) starting as process 123
+mysql-1         | 2026-11-01T13:05:57.479596Z 0 [System] [MY-015150] [Server] Server version with update: '8.4.13.0'
+mysql-1         | 2026-11-01T13:05:57.483924Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+
+
+payment-1       | {"level":40,"time":1793538357517,"service":"payment","attempt":2,"reason":"connect ECONNREFUSED 172.18.0.2:3306","msg":"Database not ready, retrying"}
+notification-1  | {"level":40,"time":1793538357517,"service":"notification","attempt":2,"reason":"connect ECONNREFUSED 172.18.0.2:3306","msg":"Database not ready, retrying"}
+
+
+
+
+catalog-1       | {"level":40,"time":1793538357530,"service":"catalog","attempt":2,"reason":"connect ECONNREFUSED 172.18.0.2:3306","msg":"Database not ready, retrying"}
+inventory-1     | {"level":40,"time":1793538357540,"service":"inventory","attempt":2,"reason":"connect ECONNREFUSED 172.18.0.2:3306","msg":"Database not ready, retrying"}
+mysql-1         | 2026-11-01T13:05:57.546983Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+booking-1       | {"level":40,"time":1793538357640,"service":"booking","attempt":2,"reason":"connect ECONNREFUSED 172.18.0.2:3306","msg":"Database not ready, retrying"}
+mysql-1         | 2026-11-01T13:05:57.656953Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+mysql-1         | 2026-11-01T13:05:57.656969Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+mysql-1         | 2026-11-01T13:05:57.657829Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+mysql-1         | 2026-11-01T13:05:57.663861Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: /var/run/mysqld/mysqlx.sock
+mysql-1         | 2026-11-01T13:05:57.663890Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.13'  socket: '/var/run/mysqld/mysqld.sock'  port: 0  MySQL Community Server - GPL.
+mysql-1         | 2026-11-01 13:05:57+00:00 [Note] [Entrypoint]: Temporary server started.
+mysql-1         | '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+mysql-1         | 
+mysql-1         | 2026-11-01 13:05:58+00:00 [Note] [Entrypoint]: /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init-databases.sh
+mysql-1         | mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql-1         | created catalog_db for catalog_user
+mysql-1         | mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql-1         | created inventory_db for inventory_user
+mysql-1         | mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql-1         | created booking_db for booking_user
+mysql-1         | mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql-1         | created payment_db for payment_user
+mysql-1         | mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql-1         | created notification_db for notification_user
+mysql-1         | 
+mysql-1         | 2026-11-01 13:05:58+00:00 [Note] [Entrypoint]: Stopping temporary server
+mysql-1         | 2026-11-01T13:05:58.183952Z 15 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.4.13).
+mysql-1         | 2026-11-01T13:05:59.171477Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.4.13)  MySQL Community Server - GPL.
+mysql-1         | 2026-11-01T13:05:59.171499Z 0 [System] [MY-015016] [Server] MySQL Server - end.
+mysql-1         | 2026-11-01 13:05:59+00:00 [Note] [Entrypoint]: Temporary server stopped
+mysql-1         | 
+mysql-1         | 2026-11-01 13:05:59+00:00 [Note] [Entrypoint]: MySQL init process done. Ready for start up.
+mysql-1         | 
+mysql-1         | 2026-11-01T13:05:59.194472Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+mysql-1         | 2026-11-01T13:05:59.336391Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.13) starting as process 1
+mysql-1         | 2026-11-01T13:05:59.336393Z 0 [System] [MY-015150] [Server] Server version with update: '8.4.13.0'
+mysql-1         | 2026-11-01T13:05:59.338613Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+mysql-1         | 2026-11-01T13:05:59.396087Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+mysql-1         | 2026-11-01T13:05:59.495981Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+mysql-1         | 2026-11-01T13:05:59.495997Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+mysql-1         | 2026-11-01T13:05:59.496921Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+mysql-1         | 2026-11-01T13:05:59.503508Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+mysql-1         | 2026-11-01T13:05:59.503528Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.13'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+
+
+payment-1       | {"level":30,"time":1793538359530,"service":"payment","msg":"Database connected"}
+notification-1  | {"level":30,"time":1793538359530,"service":"notification","msg":"Database connected"}
+
+
+catalog-1       | {"level":30,"time":1793538359542,"service":"catalog","msg":"Database connected"}
+notification-1  | {"level":30,"time":1793538359548,"service":"notification","file":"001_initialize.sql","msg":"Migration applied"}
+inventory-1     | {"level":30,"time":1793538359550,"service":"inventory","msg":"Database connected"}
+payment-1       | {"level":30,"time":1793538359554,"service":"payment","file":"001_initialize.sql","msg":"Migration applied"}
+catalog-1       | {"level":30,"time":1793538359567,"service":"catalog","file":"001_initialize.sql","msg":"Migration applied"}
+inventory-1     | {"level":30,"time":1793538359568,"service":"inventory","file":"001_initialize.sql","msg":"Migration applied"}
+catalog-1       | {"level":30,"time":1793538359582,"service":"catalog","file":"002_categories.sql","msg":"Migration applied"}
+booking-1       | {"level":30,"time":1793538359651,"service":"booking","msg":"Database connected"}
+booking-1       | {"level":30,"time":1793538359669,"service":"booking","file":"001_initialize.sql","msg":"Migration applied"}
+

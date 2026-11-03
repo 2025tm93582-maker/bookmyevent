@@ -1,0 +1,58 @@
+akshbabbar@Akshs-MacBook-Pro bookmyevent % node scripts/e2e-booking.mjs
+End-to-end test of the main booking transaction (correlation id e2e-mvxwqhix)
+
+1. All services are up
+PASS  catalog is UP
+PASS  inventory is UP
+PASS  booking is UP
+PASS  payment is UP
+PASS  notification is UP
+
+2. Set up an event, a show (GOLD 2500, SILVER 1200) and 8 seats
+PASS  event, show 1 and 8 seats created
+
+3. Book A1 (GOLD) and B1 (SILVER)
+PASS  booking is CONFIRMED (201)
+PASS  BR6: amount calculated by the server is 3700
+PASS  all 5 saga steps are OK
+
+4. Every service agrees
+PASS  Payment: one SUCCEEDED payment of 3700
+PASS  Inventory: hold CONFIRMED, A1 and B1 SOLD
+PASS  Notification: one BOOKING_CONFIRMED message
+
+5. Same request again with the same Idempotency-Key
+PASS  same booking returned and marked as replayed
+PASS  still only one payment
+
+6. Failure paths
+PASS  BR3: seat already sold gives 409 SEAT_UNAVAILABLE
+PASS  declined card gives 402 PAYMENT_DECLINED
+PASS  declined booking is FAILED and A2 is AVAILABLE again
+PASS  BR6: unknown seat gives 422 UNKNOWN_SEATS
+PASS  BR4: 7 seats gives 400 VALIDATION_FAILED
+PASS  missing Idempotency-Key gives 400
+
+RESULT: ALL PASS (20 of 20 checks passed)
+akshbabbar@Akshs-MacBook-Pro bookmyevent % docker compose logs booking | tail -20
+booking-1  | {"level":30,"time":1793542222376,"service":"booking","port":3003,"msg":"booking service listening"}
+booking-1  | {"level":30,"time":1793542222390,"service":"booking","msg":"Database connected"}
+booking-1  | {"level":30,"time":1793542222407,"service":"booking","file":"001_initialize.sql","msg":"Migration applied"}
+booking-1  | {"level":30,"time":1793542227198,"service":"booking","req":{"method":"GET","url":"/health"},"correlationId":"53b2adce-f0eb-49d9-aa87-d8e69ad79216","res":{"statusCode":200},"responseTime":6,"msg":"request completed"}
+booking-1  | {"level":30,"time":1793542229875,"service":"booking","req":{"method":"GET","url":"/health"},"correlationId":"b658dc79-2ff9-4e45-a4e2-e1371267f90d","res":{"statusCode":200},"responseTime":2,"msg":"request completed"}
+booking-1  | {"level":30,"time":1793542229964,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","res":{"statusCode":201},"responseTime":52,"msg":"request completed"}
+booking-1  | {"level":30,"time":1793542229973,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","idempotencyKey":"e2e-mvxwqhix","msg":"Idempotent replay"}
+booking-1  | {"level":30,"time":1793542229973,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","res":{"statusCode":201},"responseTime":1,"msg":"request completed"}
+booking-1  | {"level":40,"time":1793542229985,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","code":"SEAT_UNAVAILABLE","status":409,"msg":"One or more seats are no longer available"}
+booking-1  | {"level":40,"time":1793542229986,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","res":{"statusCode":409},"responseTime":11,"msg":"request completed"}
+booking-1  | {"level":40,"time":1793542230009,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","code":"PAYMENT_DECLINED","status":402,"msg":"The card was declined; seats released"}
+booking-1  | {"level":40,"time":1793542230010,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","res":{"statusCode":402},"responseTime":22,"msg":"request completed"}
+booking-1  | {"level":30,"time":1793542230011,"service":"booking","req":{"method":"GET","url":"/api/v1/bookings/faee6f3e-a7b5-4dcc-b3b8-fa04e8970dc6"},"correlationId":"e2e-mvxwqhix","res":{"statusCode":200},"responseTime":1,"msg":"request completed"}
+booking-1  | {"level":40,"time":1793542230017,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","code":"UNKNOWN_SEATS","status":422,"msg":"Some seats do not exist or have no price"}
+booking-1  | {"level":40,"time":1793542230018,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","res":{"statusCode":422},"responseTime":5,"msg":"request completed"}
+booking-1  | {"level":40,"time":1793542230019,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","code":"VALIDATION_FAILED","status":400,"msg":"Request body is invalid"}
+booking-1  | {"level":40,"time":1793542230020,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","res":{"statusCode":400},"responseTime":1,"msg":"request completed"}
+booking-1  | {"level":40,"time":1793542230021,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","code":"IDEMPOTENCY_KEY_REQUIRED","status":400,"msg":"Idempotency-Key header is required"}
+booking-1  | {"level":40,"time":1793542230021,"service":"booking","req":{"method":"POST","url":"/api/v1/bookings"},"correlationId":"e2e-mvxwqhix","res":{"statusCode":400},"responseTime":1,"msg":"request completed"}
+booking-1  | {"level":30,"time":1793542232237,"service":"booking","req":{"method":"GET","url":"/health"},"correlationId":"7860cfe0-b70b-4959-a902-3554ec46cb35","res":{"statusCode":200},"responseTime":0,"msg":"request completed"}
+akshbabbar@Akshs-MacBook-Pro bookmyevent % 

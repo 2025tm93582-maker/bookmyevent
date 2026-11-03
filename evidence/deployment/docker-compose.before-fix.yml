@@ -1,0 +1,102 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD}
+      INVENTORY_DB_PASSWORD: ${INVENTORY_DB_PASSWORD}
+      BOOKING_DB_PASSWORD: ${BOOKING_DB_PASSWORD}
+      PAYMENT_DB_PASSWORD: ${PAYMENT_DB_PASSWORD}
+      NOTIFICATION_DB_PASSWORD: ${NOTIFICATION_DB_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "3307:3306"
+
+  catalog:
+    build: ./services/catalog
+    environment:
+      PORT: 3001
+      SERVICE_NAME: catalog
+      DB_HOST: mysql
+      DB_USER: catalog_user
+      DB_PASSWORD: ${CATALOG_DB_PASSWORD}
+      DB_NAME: catalog_db
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mysql
+
+  inventory:
+    build: ./services/inventory
+    environment:
+      PORT: 3002
+      SERVICE_NAME: inventory
+      DB_HOST: mysql
+      DB_USER: inventory_user
+      DB_PASSWORD: ${INVENTORY_DB_PASSWORD}
+      DB_NAME: inventory_db
+      HOLD_STRATEGY: ${HOLD_STRATEGY:-atomic}
+      FAULT_CONFIRM_FAIL: ${FAULT_CONFIRM_FAIL:-false}
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mysql
+
+  booking:
+    build: ./services/booking
+    environment:
+      PORT: 3003
+      SERVICE_NAME: booking
+      DB_HOST: mysql
+      DB_USER: booking_user
+      DB_PASSWORD: ${BOOKING_DB_PASSWORD}
+      DB_NAME: booking_db
+      CATALOG_URL: http://catalog:3001/api/v1
+      INVENTORY_URL: http://inventory:3002/api/v1
+      PAYMENT_URL: http://payment:3004/api/v1
+      NOTIFICATION_URL: http://notification:3005/api/v1
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mysql
+      - catalog
+      - inventory
+      - payment
+      - notification
+
+  payment:
+    build: ./services/payment
+    environment:
+      PORT: 3004
+      SERVICE_NAME: payment
+      DB_HOST: mysql
+      DB_USER: payment_user
+      DB_PASSWORD: ${PAYMENT_DB_PASSWORD}
+      DB_NAME: payment_db
+      PAYMENT_DELAY_MS: ${PAYMENT_DELAY_MS:-0}
+      PAYMENT_FAIL_RATE: ${PAYMENT_FAIL_RATE:-0}
+    ports:
+      - "3004:3004"
+    depends_on:
+      - mysql
+
+  notification:
+    build: ./services/notification
+    environment:
+      PORT: 3005
+      SERVICE_NAME: notification
+      DB_HOST: mysql
+      DB_USER: notification_user
+      DB_PASSWORD: ${NOTIFICATION_DB_PASSWORD}
+      DB_NAME: notification_db
+      NOTIFY_DELAY_MS: ${NOTIFY_DELAY_MS:-0}
+      NOTIFY_FAIL_RATE: ${NOTIFY_FAIL_RATE:-0}
+    ports:
+      - "3005:3005"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:

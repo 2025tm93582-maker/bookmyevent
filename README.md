@@ -1,6 +1,6 @@
 # BookMyEvent — Event Ticketing Microservices
 
-Scalable Services (SE ZG583) — Assignment 1
+Scalable Services (SE ZG583), Assignments 1 and 2
 
 BookMyEvent sells tickets for events (concerts, comedy, movies, sports, theatre). It is built as **five
 Node.js / Express microservices**, each with **its own MySQL database and database user**. Booking runs the
@@ -17,6 +17,74 @@ step fails.
 
 Services talk only over REST (`/api/v1/...`). Only Booking calls other services. No service reads another
 service's database — each MySQL user is granted only its own database.
+
+---
+
+## Run with Docker (Assignment 2)
+
+You only need Docker Desktop. No local Node.js or MySQL is required.
+
+```bash
+cp .env.example .env          # then set any passwords you like in .env
+docker compose up --build
+```
+
+This builds one image per service and starts six containers: MySQL 8.4 and the five services, on the same
+ports as before (3001 to 3005). MySQL is published on port 3307 so it does not clash with a local MySQL.
+
+- On its first start, MySQL creates the five databases and users with `docker/mysql/init-databases.sh`,
+  using the passwords from `.env`. No password is stored in an image or in git.
+- MySQL has a healthcheck, and every service waits until MySQL is healthy before it starts. Booking also waits
+  for the other four services, because it calls them.
+- Every service has a healthcheck on `/health` and restarts if it stops.
+
+Check that it works:
+
+```bash
+docker compose ps                  # every container should say (healthy)
+node scripts/e2e-booking.mjs       # the main booking flow against the containers
+```
+
+Useful commands:
+
+| Command | What it does |
+|---|---|
+| `docker compose logs -f booking` | Follow one service's logs |
+| `docker compose down` | Stop and remove the containers; the data volume is kept |
+| `docker compose down -v` | Also delete the data, for a completely fresh start |
+| `PAYMENT_FAIL_RATE=1 docker compose up -d payment` | Restart one service with a failure switch on |
+| `docker compose up -d payment` | Restart it with normal settings again |
+
+What happened during the deployment, including the problem we found and fixed, is in
+`evidence/deployment/README.md`.
+
+## Run on Kubernetes (Minikube)
+
+You need Minikube and kubectl, and a `.env` as above. Stop Docker Compose first so ports 3001 to 3005 are free.
+
+```bash
+docker compose down
+minikube start --driver=docker --cpus=4 --memory=4096
+bash k8s/deploy.sh                 # builds the images, loads them into minikube, applies k8s/, waits until ready
+minikube tunnel                    # in a second terminal; leave it running
+node scripts/e2e-booking.mjs       # the main booking flow through the cluster
+```
+
+`deploy.sh` creates the `bookmyevent` namespace, a Secret from `.env`, a ConfigMap with the MySQL init script,
+and then MySQL and the five services from `k8s/`. With the tunnel running, the services are on
+`localhost:3001` to `3005` as before.
+
+| Command | What it does |
+|---|---|
+| `kubectl -n bookmyevent get pods,svc` | Pods and services |
+| `kubectl -n bookmyevent logs deploy/booking` | One service's logs |
+| `kubectl -n bookmyevent scale deployment inventory --replicas=3` | Run three copies of Inventory |
+| `kubectl -n bookmyevent delete pod <name>` | Kubernetes replaces the pod by itself |
+| `minikube stop` | Stop the cluster and keep everything for next time |
+
+The Kubernetes evidence, including scaling and self-healing, is in `evidence/kubernetes/README.md`.
+
+The sections below describe running the services directly on your machine, as in Assignment 1.
 
 ---
 
@@ -189,6 +257,7 @@ services/<name>/
     server.js            starts the app, connects to MySQL (with retry), runs migrations
     openapi.yaml         API spec served at /docs
     .env.example         configuration template
+    Dockerfile           builds the service's image
     src/app.js           middleware order: correlation id → request logger → JSON → routes → 404 → error handler
     src/config/          env, database pool + migrations, logger
     src/routes/  src/controllers/  src/validators/      API layer
@@ -197,7 +266,10 @@ services/<name>/
     src/clients/         (booking) HTTP clients for the other services
     src/migrations/      numbered .sql files
     tests/               unit tests (node:test)
-evidence/                outputs, DB state and logs for each challenge and the tests
+evidence/                outputs, DB state and logs for each challenge, the tests and the deployment
+docker/mysql/            MySQL init script used by Docker Compose
+docker-compose.yml       the whole application in containers
+k8s/                     Kubernetes manifests and deploy.sh for Minikube
 logs/                    service logs when started with start-all.sh (git-ignored)
 ```
 
